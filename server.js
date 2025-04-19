@@ -389,7 +389,7 @@ app.get('/retailer-details', (req, res) => {
 
 const csvParser = require('csv-parser');
 
-app.get('/sales-data', (req, res) => {
+app.get('/sales-data', async (req, res) => {
   const { email } = req.query;
   if (!email) {
     return res.status(400).json({ success: false, message: 'Missing retailer email' });
@@ -397,9 +397,13 @@ app.get('/sales-data', (req, res) => {
 
   const safeEmail = email.replace(/[^a-zA-Z0-9]/g, '_');
   const retailerCustomerCsvPath = path.join(__dirname, 'retailers', `customers_${safeEmail}.csv`);
+  const retailerMedicineDbPath = path.join(__dirname, 'retailers', `medicines_${safeEmail}.db`);
 
   if (!fs.existsSync(retailerCustomerCsvPath)) {
     return res.status(404).json({ success: false, message: 'No sales data found for this retailer' });
+  }
+  if (!fs.existsSync(retailerMedicineDbPath)) {
+    return res.status(404).json({ success: false, message: 'No medicine database found for this retailer' });
   }
 
   const salesByMedicine = {};
@@ -418,12 +422,46 @@ app.get('/sales-data', (req, res) => {
       salesByMedicine[medicineName] += quantity;
     })
     .on('end', () => {
-      // Convert salesByMedicine object to array sorted by medicine name
-      const salesArray = Object.entries(salesByMedicine)
-        .map(([medName, totalQuantity]) => ({ date: modifiedDate, medicineName: medName, totalQuantity }))
-        .sort((a, b) => a.medicineName.localeCompare(b.medicineName));
+      // Open medicine DB and get prices for medicines
+      const sqlite3 = require('sqlite3').verbose();
+      const db = new sqlite3.Database(retailerMedicineDbPath, sqlite3.OPEN_READONLY, (err) => {
+        if (err) {
+          console.error('Error opening medicine DB:', err);
+          return res.status(500).json({ success: false, message: 'Failed to open medicine database', error: err.message });
+        }
+      });
 
-      res.json({ success: true, data: salesArray });
+      const medicineNames = Object.keys(salesByMedicine);
+      if (medicineNames.length === 0) {
+        db.close();
+        return res.json({ success: true, data: [] });
+      }
+
+      const placeholders = medicineNames.map(() => '?').join(',');
+      const query = `SELECT name, price FROM medicines WHERE name IN (${placeholders})`;
+
+      db.all(query, medicineNames, (err, rows) => {
+        if (err) {
+          console.error('Error querying medicine prices:', err);
+          db.close();
+          return res.status(500).json({ success: false, message: 'Failed to query medicine prices', error: err.message });
+        }
+
+        const priceMap = {};
+        rows.forEach(row => {
+          priceMap[row.name] = row.price;
+        });
+
+        const salesArray = medicineNames.map(medName => {
+          const totalQuantity = salesByMedicine[medName];
+          const price = priceMap[medName] || 0;
+          const totalPrice = price * totalQuantity;
+          return { date: modifiedDate, medicineName: medName, totalQuantity, price, totalPrice };
+        }).sort((a, b) => a.medicineName.localeCompare(b.medicineName));
+
+        db.close();
+        res.json({ success: true, data: salesArray });
+      });
     })
     .on('error', (err) => {
       console.error('Error reading sales data CSV:', err);

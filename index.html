@@ -225,16 +225,18 @@ button:active {
         <tr>
           <th style="border-bottom: 1px solid #7f9cf5; padding: 8px; text-align: left;">Date</th>
           <th style="border-bottom: 1px solid #7f9cf5; padding: 8px; text-align: left;">Medicine Name</th>
-          <th style="border-bottom: 1px solid #7f9cf5; padding: 8px; text-align: right;">Total Quantity Sold</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Sales data rows will be inserted here -->
-      </tbody>
-    </table>
-      <div id="salesLoading" style="margin-top: 10px;">Loading sales data...</div>
-      <div id="salesError" style="margin-top: 10px; color: #ff6b6b; display: none;"></div>
-    </div>
+      <th style="border-bottom: 1px solid #7f9cf5; padding: 8px; text-align: right;">Total Quantity Sold</th>
+      <th style="border-bottom: 1px solid #7f9cf5; padding: 8px; text-align: right;">Price (per unit)</th>
+      <th style="border-bottom: 1px solid #7f9cf5; padding: 8px; text-align: right;">Total Price</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- Sales data rows will be inserted here -->
+  </tbody>
+</table>
+  <div id="salesLoading" style="margin-top: 10px;">Loading sales data...</div>
+  <div id="salesError" style="margin-top: 10px; color: #ff6b6b; display: none;"></div>
+</div>
 
     <hr style="margin: 30px 0;" />
 
@@ -587,9 +589,19 @@ Thank you for choosing our service.`;
           quantityCell.textContent = sale.totalQuantity;
           quantityCell.style.padding = '8px';
           quantityCell.style.textAlign = 'right';
+          const priceCell = document.createElement('td');
+          priceCell.textContent = sale.price !== undefined ? sale.price.toFixed(2) : '';
+          priceCell.style.padding = '8px';
+          priceCell.style.textAlign = 'right';
+          const totalPriceCell = document.createElement('td');
+          totalPriceCell.textContent = sale.totalPrice !== undefined ? sale.totalPrice.toFixed(2) : '';
+          totalPriceCell.style.padding = '8px';
+          totalPriceCell.style.textAlign = 'right';
           row.appendChild(dateCell);
           row.appendChild(medicineCell);
           row.appendChild(quantityCell);
+          row.appendChild(priceCell);
+          row.appendChild(totalPriceCell);
           salesTableBody.appendChild(row);
         });
       } catch (err) {
