@@ -387,6 +387,52 @@ app.get('/retailer-details', (req, res) => {
   });
 });
 
+const csvParser = require('csv-parser');
+
+app.get('/sales-data', (req, res) => {
+  const { email } = req.query;
+  if (!email) {
+    return res.status(400).json({ success: false, message: 'Missing retailer email' });
+  }
+
+  const safeEmail = email.replace(/[^a-zA-Z0-9]/g, '_');
+  const retailerCustomerCsvPath = path.join(__dirname, 'retailers', `customers_${safeEmail}.csv`);
+
+  if (!fs.existsSync(retailerCustomerCsvPath)) {
+    return res.status(404).json({ success: false, message: 'No sales data found for this retailer' });
+  }
+
+  const salesByDate = {};
+
+  fs.createReadStream(retailerCustomerCsvPath)
+    .pipe(csvParser())
+    .on('data', (row) => {
+      // Assuming the CSV has a "Date" column or we can use file modification date as fallback
+      // Since current CSV does not have date, we will use file modification date for all rows
+      // For better tracking, date should be added when saving customer data
+      const stats = fs.statSync(retailerCustomerCsvPath);
+      const modifiedDate = stats.mtime.toISOString().split('T')[0]; // YYYY-MM-DD
+
+      const quantity = parseInt(row['Quantity'], 10) || 0;
+      if (!salesByDate[modifiedDate]) {
+        salesByDate[modifiedDate] = 0;
+      }
+      salesByDate[modifiedDate] += quantity;
+    })
+    .on('end', () => {
+      // Convert salesByDate object to array sorted by date
+      const salesArray = Object.entries(salesByDate)
+        .map(([date, totalQuantity]) => ({ date, totalQuantity }))
+        .sort((a, b) => a.date.localeCompare(b.date));
+
+      res.json({ success: true, data: salesArray });
+    })
+    .on('error', (err) => {
+      console.error('Error reading sales data CSV:', err);
+      res.status(500).json({ success: false, message: 'Failed to read sales data', error: err.message });
+    });
+});
+
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });

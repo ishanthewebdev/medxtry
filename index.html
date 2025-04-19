@@ -223,6 +223,28 @@ button:active {
     <div id="uploadStatus" style="margin-top: 10px; font-weight: bold;"></div>
   </div>
 
+  <button type="button" id="viewSalesBtn" style="margin: 20px auto; display: block; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); color: #fff; font-weight: 800; padding: 16px; border: none; border-radius: 14px; cursor: pointer; font-size: 1.15rem; letter-spacing: 0.1em; box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6); transition: background 0.4s ease, box-shadow 0.4s ease, transform 0.2s ease; user-select: none; width: 360px; max-width: 90vw;">
+    View Sales
+  </button>
+
+  <div id="salesModal" style="display:none; position: fixed; top: 10%; left: 50%; transform: translateX(-50%); background: rgba(30, 60, 114, 0.95); color: #f0f4f8; padding: 20px; border-radius: 12px; max-width: 90vw; max-height: 70vh; overflow-y: auto; z-index: 10000;">
+    <h3>Day-by-Day Sales</h3>
+    <button id="closeSalesModal" style="background: #764ba2; color: white; border: none; border-radius: 8px; padding: 6px 12px; cursor: pointer; margin-bottom: 10px;">Close</button>
+    <table id="salesTable" style="width: 100%; border-collapse: collapse;">
+      <thead>
+        <tr>
+          <th style="border-bottom: 1px solid #7f9cf5; padding: 8px; text-align: left;">Date</th>
+          <th style="border-bottom: 1px solid #7f9cf5; padding: 8px; text-align: right;">Total Quantity Sold</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Sales data rows will be inserted here -->
+      </tbody>
+    </table>
+    <div id="salesLoading" style="margin-top: 10px;">Loading sales data...</div>
+    <div id="salesError" style="margin-top: 10px; color: #ff6b6b; display: none;"></div>
+  </div>
+
   <footer style="text-align:center; padding: 15px 0; color: #7f9cf5; font-weight: 700; font-size: 1rem; user-select:none;">
     &copy; 2024 MEDX
   </footer>
@@ -511,6 +533,69 @@ Thank you for choosing our service.`;
       }
     });
 
+  </script>
+
+  <script>
+    document.getElementById('viewSalesBtn').addEventListener('click', async () => {
+      const salesModal = document.getElementById('salesModal');
+      const salesTableBody = document.querySelector('#salesTable tbody');
+      const salesLoading = document.getElementById('salesLoading');
+      const salesError = document.getElementById('salesError');
+
+      salesTableBody.innerHTML = '';
+      salesError.style.display = 'none';
+      salesLoading.style.display = 'block';
+      salesModal.style.display = 'block';
+
+      const retailerEmail = sessionStorage.getItem('retailerEmail');
+      if (!retailerEmail) {
+        salesLoading.style.display = 'none';
+        salesError.textContent = 'Retailer email not found. Please login again.';
+        salesError.style.display = 'block';
+        return;
+      }
+
+      try {
+        const response = await fetch(`http://localhost:3000/sales-data?email=${encodeURIComponent(retailerEmail)}`);
+        const data = await response.json();
+        salesLoading.style.display = 'none';
+
+        if (!data.success) {
+          salesError.textContent = data.message || 'Failed to load sales data.';
+          salesError.style.display = 'block';
+          return;
+        }
+
+        if (data.data.length === 0) {
+          salesError.textContent = 'No sales data available.';
+          salesError.style.display = 'block';
+          return;
+        }
+
+        data.data.forEach(sale => {
+          const row = document.createElement('tr');
+          const dateCell = document.createElement('td');
+          dateCell.textContent = sale.date;
+          dateCell.style.padding = '8px';
+          const quantityCell = document.createElement('td');
+          quantityCell.textContent = sale.totalQuantity;
+          quantityCell.style.padding = '8px';
+          quantityCell.style.textAlign = 'right';
+          row.appendChild(dateCell);
+          row.appendChild(quantityCell);
+          salesTableBody.appendChild(row);
+        });
+      } catch (err) {
+        salesLoading.style.display = 'none';
+        salesError.textContent = 'Error loading sales data.';
+        salesError.style.display = 'block';
+        console.error('Error fetching sales data:', err);
+      }
+    });
+
+    document.getElementById('closeSalesModal').addEventListener('click', () => {
+      document.getElementById('salesModal').style.display = 'none';
+    });
   </script>
 
 </body>
