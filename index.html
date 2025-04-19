@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Medicine ERP WhatsApp Bot</title>
+  <style>
+    /* White and blue combination CSS styles */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #e0f0ff 0%, #a0c8ff 100%);
+      color: #003366;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      background: #ffffff;
+      padding: 40px 50px;
+      border-radius: 15px;
+      box-shadow: 0 8px 32px 0 rgba(0, 51, 102, 0.2);
+      width: 400px;
+      max-width: 90vw;
+      position: relative;
+    }
+
+    h1 {
+      text-align: center;
+      font-weight: 700;
+      margin-bottom: 30px;
+      font-size: 2.2rem;
+      letter-spacing: 1.5px;
+      color: #004080;
+    }
+
+    h3 {
+      margin-bottom: 20px;
+      font-weight: 600;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: #0066cc;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    input, select, textarea {
+      background: #f0f8ff;
+      border: 1px solid #99c2ff;
+      border-radius: 8px;
+      padding: 12px 15px;
+      margin-bottom: 20px;
+      color: #003366;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+    }
+
+    input::placeholder, textarea::placeholder {
+      color: #6699cc;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #004080;
+      box-shadow: 0 0 8px 2px rgba(0, 102, 204, 0.5);
+      color: #003366;
+    }
+
+    select {
+      cursor: pointer;
+      color: #003366;
+    }
+
+    select option {
+      color: #003366;
+      background-color: #f0f8ff;
+    }
+
+    #expiryDate {
+      font-weight: 600;
+      margin-bottom: 20px;
+      text-align: center;
+      font-size: 1.1rem;
+      color: #004080;
+    }
+
+    button {
+      background: #0073e6;
+      color: #fff;
+      font-weight: 700;
+      padding: 15px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      letter-spacing: 1.2px;
+      box-shadow: 0 4px 15px rgba(0, 115, 230, 0.6);
+      transition: background 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    button:hover {
+      background: #005bb5;
+      box-shadow: 0 6px 20px rgba(0, 91, 181, 0.8);
+    }
+
+    #logoutBtn {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background-color: #0073e6;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      box-shadow: 0 4px 10px rgba(0, 115, 230, 0.6);
+      transition: background-color 0.3s ease;
+    }
+    #logoutBtn:hover {
+      background-color: #005bb5;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        width: 90vw;
+        padding: 30px 20px;
+      }
+      h1 {
+        font-size: 1.8rem;
+      }
+      button {
+        font-size: 1rem;
+        padding: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <button id="logoutBtn">Logout</button>
+    <h1>Medicine ERP - WhatsApp Notifications</h1>
+
+    <h3>Send Reminder to Customer</h3>
+    <form id="messageForm">
+      <input type="text" id="customerName" placeholder="Enter customer name" required />
+      <input type="text" id="location" placeholder="Enter customer location" required />
+      <input type="text" id="phone" placeholder="Enter customer phone (e.g., 919876543210)" required />
+
+      <select id="medicineSelect" required>
+        <option value="">Select Medicine</option>
+      </select>
+
+      <div id="expiryDate">Expiry Date: N/A</div>
+
+      <input type="number" id="quantity" placeholder="Enter quantity" min="1" required />
+
+      <input type="text" id="message" placeholder="Enter your message" required />
+
+      <button type="submit">Send Message</button>
+    </form>
+  </div>
+
+  <script>
+    let medicinesData = [];
+
+    // Fetch medicines and populate dropdown
+    async function loadMedicines() {
+      const retailerEmail = sessionStorage.getItem('retailerEmail');
+      if (!retailerEmail) {
+        alert('Retailer email not found. Please login again.');
+        window.location.href = 'login.html';
+        return;
+      }
+      try {
+        const response = await fetch(`http://localhost:3000/medicines?email=${encodeURIComponent(retailerEmail)}`);
+        const data = await response.json();
+        if (data.success) {
+          medicinesData = data.data;
+          const select = document.getElementById('medicineSelect');
+          select.innerHTML = '<option value="">Select Medicine</option>';
+          data.data.forEach(med => {
+            const option = document.createElement('option');
+            option.value = med.id;
+            option.textContent = med.name + ' (Qty: ' + med.quantity + ')';
+            select.appendChild(option);
+          });
+          updateExpiryDate(); // Reset expiry date display
+        } else {
+          alert('Failed to load medicines');
+        }
+      } catch (err) {
+        console.error('Error loading medicines:', err);
+        alert('Error loading medicines');
+      }
+    }
+
+    // Update expiry date display based on selected medicine
+    function updateExpiryDate() {
+      const select = document.getElementById('medicineSelect');
+      const expiryDiv = document.getElementById('expiryDate');
+      const selectedId = select.value;
+      if (!selectedId) {
+        expiryDiv.textContent = 'Expiry Date: N/A';
+        return;
+      }
+      const med = medicinesData.find(m => m.id === parseInt(selectedId));
+      if (med && med.expiry_date) {
+        expiryDiv.textContent = 'Expiry Date: ' + med.expiry_date;
+      } else {
+        expiryDiv.textContent = 'Expiry Date: N/A';
+      }
+    }
+
+    document.getElementById('medicineSelect').addEventListener('change', updateExpiryDate);
+
+    document.getElementById('messageForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const retailerEmail = sessionStorage.getItem('retailerEmail');
+      if (!retailerEmail) {
+        alert('Retailer email not found. Please login again.');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      const customerName = document.getElementById('customerName').value.trim();
+      const location = document.getElementById('location').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const medicineSelect = document.getElementById('medicineSelect');
+      const medicineId = medicineSelect.value;
+      const quantity = parseInt(document.getElementById('quantity').value.trim(), 10);
+      const messageInput = document.getElementById('message').value.trim();
+
+      if (!customerName) {
+        alert('Please enter customer name');
+        return;
+      }
+      if (!location) {
+        alert('Please enter customer location');
+        return;
+      }
+      if (!medicineId) {
+        alert('Please select a medicine');
+        return;
+      }
+      if (!quantity || quantity <= 0) {
+        alert('Please enter a valid quantity');
+        return;
+      }
+
+      const med = medicinesData.find(m => m.id === parseInt(medicineId));
+      if (!med) {
+        alert('Selected medicine not found');
+        return;
+      }
+
+      // Compose professional message including all details
+      const fullMessage = 
+`Dear ${customerName},
+
+Location: ${location}
+
+Medicine Details:
+- Name: ${med.name}
+- Quantity: ${quantity}
+- Expiry Date: ${med.expiry_date}
+
+Message:
+${messageInput}
+
+Thank you for choosing our service.`;
+
+      // Send message to customer first
+      try {
+        const response = await fetch('http://localhost:3000/send-message', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone, message: fullMessage })
+        });
+        const data = await response.json();
+        if (!data.success) {
+          alert('Error sending message');
+          return;
+        }
+      } catch (err) {
+        console.error('Error sending message:', err);
+        alert('Error sending message');
+        return;
+      }
+
+      // Deduct quantity from database only if message sent successfully
+      try {
+        const deductResponse = await fetch('http://localhost:3000/deduct-medicine', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: medicineId, quantity, email: retailerEmail })
+        });
+        const deductData = await deductResponse.json();
+        if (!deductData.success) {
+          alert('Failed to deduct quantity: ' + deductData.message);
+          return;
+        }
+      } catch (err) {
+        console.error('Error deducting quantity:', err);
+        alert('Error deducting quantity');
+        return;
+      }
+
+      // Save customer data to CSV
+      try {
+        const saveResponse = await fetch('http://localhost:3000/save-customer-data', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            customerName,
+            location,
+            phone,
+            medicineName: med.name,
+            quantity,
+            expiryDate: med.expiry_date,
+            message: messageInput,
+            email: retailerEmail
+          })
+        });
+        const saveData = await saveResponse.json();
+        if (!saveData.success) {
+          alert('Failed to save customer data: ' + saveData.message);
+          return;
+        }
+      } catch (err) {
+        console.error('Error saving customer data:', err);
+        alert('Error saving customer data');
+        return;
+      }
+
+      alert('Message sent and quantity updated successfully!');
+
+      // Reset form fields
+      document.getElementById('customerName').value = '';
+      document.getElementById('location').value = '';
+      medicineSelect.value = '';
+      updateExpiryDate();
+      document.getElementById('quantity').value = '';
+      document.getElementById('message').value = '';
+      document.getElementById('phone').value = '';
+
+      // Reload medicines to update quantities and dropdown
+      await loadMedicines();
+    });
+
+    // Load medicines on page load
+    window.onload = loadMedicines;
+
+    // Logout button functionality
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+      sessionStorage.clear();
+      window.location.href = 'login.html';
+    });
+  </script>
+
+</body>
+</html>
