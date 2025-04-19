@@ -6,145 +6,190 @@
   <title>Medicine ERP WhatsApp Bot</title>
   <style>
     /* White and blue combination CSS styles */
-    body {
+    /* Advanced CSS with brand animation */
+@keyframes fadeOut {
+  0% { opacity: 1; }
+  100% { opacity: 0; visibility: hidden; }
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.7; }
+}
+body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #e0f0ff 0%, #a0c8ff 100%);
-      color: #003366;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      color: #f0f4f8;
       margin: 0;
       padding: 0;
       min-height: 100vh;
       display: flex;
       justify-content: center;
-      align-items: center;
+      align-items: flex-start;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding-top: 40px;
     }
+.brand-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: #1e3c72;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  animation: fadeOut 2.5s ease forwards;
+  animation-delay: 2s;
+}
+.brand-name {
+  font-size: 4rem;
+  font-weight: 900;
+  color: #7f9cf5;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  animation: pulse 2s ease infinite;
+  user-select: none;
+  font-family: 'Segoe UI Black', 'Arial Black', sans-serif;
+  text-shadow: 0 0 10px #7f9cf5, 0 0 20px #7f9cf5, 0 0 30px #667eea;
+}
+.container {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  padding: 25px 30px;
+  border-radius: 15px;
+  box-shadow: 0 6px 24px 0 rgba(0, 0, 0, 0.3);
+  width: 360px;
+  max-width: 90vw;
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  transition: box-shadow 0.3s ease;
+  color: #f0f4f8;
+  text-align: center;
+  z-index: 1;
+}
+.container:hover {
+  box-shadow: 0 12px 48px 0 rgba(0, 0, 0, 0.5);
+}
+h1, h3 {
+  margin-bottom: 20px;
+  font-weight: 800;
+  font-size: 1.8rem;
+  letter-spacing: 0.1em;
+  color: #a3bffa;
+  text-shadow: 0 0 8px rgba(0,0,0,0.5);
+}
+  input, select, textarea {
+  width: 100%;
+  max-width: 100%;
+  padding: 14px 18px;
+  margin-bottom: 22px;
+  border-radius: 12px;
+  border: none;
+  background: rgba(255,255,255,0.15);
+  color: #f0f4f8;
+  font-size: 1.1rem;
+  box-shadow: inset 0 0 8px rgba(255,255,255,0.2);
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+  box-sizing: border-box;
+}
+input::placeholder, textarea::placeholder {
+  color: #cbd5e1;
+  font-style: italic;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  background: rgba(255,255,255,0.3);
+  box-shadow: 0 0 12px 2px #7f9cf5;
+  color: #1e293b;
+  font-weight: 600;
+}
+select {
+  cursor: pointer;
+  color: #f0f4f8;
+  font-weight: 600;
+}
+select option {
+  color: #1e293b;
+  background-color: #f0f4f8;
+}
+#expiryDate {
+  font-weight: 700;
+  margin-bottom: 25px;
+  text-align: center;
+  font-size: 1.2rem;
+  color: #a3bffa;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+button {
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  font-weight: 800;
+  padding: 16px;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  font-size: 1.15rem;
+  letter-spacing: 0.1em;
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+  transition: background 0.4s ease, box-shadow 0.4s ease, transform 0.2s ease;
+  user-select: none;
+  width: 100%;
+}
+button:hover {
+  background: linear-gradient(90deg, #5a67d8 0%, #6b46c1 100%);
+  box-shadow: 0 8px 28px rgba(107, 70, 193, 0.8);
+  transform: translateY(-2px);
+}
+button:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
+}
+.error {
+  color: #ff6b6b;
+  margin-bottom: 15px;
+  font-weight: 700;
+  text-shadow: 0 0 4px rgba(255, 107, 107, 0.7);
+}
+.success {
+  color: #6ee7b7;
+  margin-bottom: 15px;
+  font-weight: 700;
+  text-shadow: 0 0 4px rgba(110, 231, 183, 0.7);
+}
+.link, p.signup-link {
+  margin-top: 15px;
+  font-size: 1rem;
+  color: #a3bffa;
+}
+.link a, p.signup-link a {
+  color: #7f9cf5;
+  text-decoration: none;
+  font-weight: 700;
+  transition: color 0.3s ease;
+}
+.link a:hover, p.signup-link a:hover {
+  color: #c3dafe;
+  text-decoration: underline;
+}
+@media (max-width: 480px) {
+  .container {
+    width: 90vw;
+    padding: 20px 20px;
+  }
+  h1, h3 {
+    font-size: 1.6rem;
+  }
+  button {
+    font-size: 0.95rem;
+    padding: 12px;
+  }
+}
 
-    .container {
-      background: #ffffff;
-      padding: 40px 50px;
-      border-radius: 15px;
-      box-shadow: 0 8px 32px 0 rgba(0, 51, 102, 0.2);
-      width: 400px;
-      max-width: 90vw;
-      position: relative;
-    }
-
-    h1 {
-      text-align: center;
-      font-weight: 700;
-      margin-bottom: 30px;
-      font-size: 2.2rem;
-      letter-spacing: 1.5px;
-      color: #004080;
-    }
-
-    h3 {
-      margin-bottom: 20px;
-      font-weight: 600;
-      text-align: center;
-      text-transform: uppercase;
-      letter-spacing: 1.2px;
-      color: #0066cc;
-    }
-
-    form {
-      display: flex;
-      flex-direction: column;
-    }
-
-    input, select, textarea {
-      background: #f0f8ff;
-      border: 1px solid #99c2ff;
-      border-radius: 8px;
-      padding: 12px 15px;
-      margin-bottom: 20px;
-      color: #003366;
-      font-size: 1rem;
-      transition: border-color 0.3s ease;
-    }
-
-    input::placeholder, textarea::placeholder {
-      color: #6699cc;
-    }
-
-    input:focus, select:focus, textarea:focus {
-      outline: none;
-      border-color: #004080;
-      box-shadow: 0 0 8px 2px rgba(0, 102, 204, 0.5);
-      color: #003366;
-    }
-
-    select {
-      cursor: pointer;
-      color: #003366;
-    }
-
-    select option {
-      color: #003366;
-      background-color: #f0f8ff;
-    }
-
-    #expiryDate {
-      font-weight: 600;
-      margin-bottom: 20px;
-      text-align: center;
-      font-size: 1.1rem;
-      color: #004080;
-    }
-
-    button {
-      background: #0073e6;
-      color: #fff;
-      font-weight: 700;
-      padding: 15px;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      font-size: 1.1rem;
-      letter-spacing: 1.2px;
-      box-shadow: 0 4px 15px rgba(0, 115, 230, 0.6);
-      transition: background 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    button:hover {
-      background: #005bb5;
-      box-shadow: 0 6px 20px rgba(0, 91, 181, 0.8);
-    }
-
-    #logoutBtn {
-      position: absolute;
-      top: 15px;
-      right: 15px;
-      background-color: #0073e6;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 1rem;
-      box-shadow: 0 4px 10px rgba(0, 115, 230, 0.6);
-      transition: background-color 0.3s ease;
-    }
-    #logoutBtn:hover {
-      background-color: #005bb5;
-    }
-
-    @media (max-width: 480px) {
-      .container {
-        width: 90vw;
-        padding: 30px 20px;
-      }
-      h1 {
-        font-size: 1.8rem;
-      }
-      button {
-        font-size: 1rem;
-        padding: 12px;
-      }
-    }
   </style>
 </head>
 <body>
-
+  <div class="brand-overlay">
+    <div class="brand-name">MEDX</div>
+  </div>
   <div class="container">
     <button id="logoutBtn">Logout</button>
     <h1>Medicine ERP - WhatsApp Notifications</h1>
@@ -178,7 +223,17 @@
     <div id="uploadStatus" style="margin-top: 10px; font-weight: bold;"></div>
   </div>
 
+  <footer style="text-align:center; padding: 15px 0; color: #7f9cf5; font-weight: 700; font-size: 1rem; user-select:none;">
+    &copy; 2024 MEDX
+  </footer>
+
   <script>
+    window.addEventListener('load', () => {
+    const overlay = document.querySelector('.brand-overlay');
+    setTimeout(() => {
+      overlay.style.display = 'none';
+    }, 2500);
+  });
     let medicinesData = [];
     let retailerShopName = '';
 
