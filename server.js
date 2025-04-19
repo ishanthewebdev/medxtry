@@ -350,6 +350,43 @@ app.post('/reinitialize-medicines-db', async (req, res) => {
   }
 });
 
+// New endpoint to get retailer details by email
+app.get('/retailer-details', (req, res) => {
+  let { email } = req.query;
+  console.log('Received /retailer-details request for email:', email);
+  if (!email) {
+    return res.status(400).json({ success: false, message: 'Missing email parameter' });
+  }
+  email = email.trim().toLowerCase();
+
+  fs.readFile(RETAILERS_JSON_PATH, 'utf8', (err, data) => {
+    if (err) {
+      console.error('Error reading retailers.json:', err);
+      return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+
+    let retailers = [];
+    try {
+      retailers = JSON.parse(data);
+      console.log('Retailers loaded:', retailers.map(r => r.email));
+    } catch (parseErr) {
+      console.error('Error parsing retailers.json:', parseErr);
+      return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+
+    const retailer = retailers.find(r => r.email.toLowerCase() === email);
+    if (!retailer) {
+      console.log('Retailer not found for email:', email);
+      return res.status(404).json({ success: false, message: 'Retailer not found' });
+    }
+
+    console.log('Found retailer:', retailer);
+    // Return retailer details except password
+    const { password, ...retailerDetails } = retailer;
+    res.json({ success: true, data: retailerDetails });
+  });
+});
+
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });

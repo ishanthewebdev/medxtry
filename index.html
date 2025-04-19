@@ -180,6 +180,36 @@
 
   <script>
     let medicinesData = [];
+    let retailerShopName = '';
+
+    // Fetch retailer details including shopName
+    async function loadRetailerDetails() {
+      let retailerEmail = sessionStorage.getItem('retailerEmail');
+      if (retailerEmail) {
+        retailerEmail = retailerEmail.trim().toLowerCase();
+      }
+      if (!retailerEmail) {
+        alert('Retailer email not found. Please login again.');
+        window.location.href = 'login.html';
+        return;
+      }
+      try {
+        const response = await fetch(`http://localhost:3000/retailer-details?email=${encodeURIComponent(retailerEmail)}`);
+        if (!response.ok) {
+          console.warn('Failed to load retailer details, status:', response.status);
+          return;
+        }
+        const data = await response.json();
+        if (data.success) {
+          retailerShopName = data.data.shopName || '';
+          console.log('Received retailer shopName:', retailerShopName);
+        } else {
+          console.warn('Failed to load retailer details');
+        }
+      } catch (err) {
+        console.error('Error loading retailer details:', err);
+      }
+    }
 
     // Fetch medicines and populate dropdown
     async function loadMedicines() {
@@ -211,6 +241,7 @@
         alert('Error loading medicines');
       }
     }
+
 
     // Update expiry date display based on selected medicine
     function updateExpiryDate() {
@@ -276,7 +307,9 @@
       const fullMessage = 
 `Dear ${customerName},
 
-Location: ${location}
+Location: ${location},
+
+Shop Name: ${retailerShopName},
 
 Medicine Details:
 - Name: ${med.name}
@@ -367,7 +400,11 @@ Thank you for choosing our service.`;
     });
 
     // Load medicines on page load
-    window.onload = loadMedicines;
+    window.onload = async () => {
+      await loadRetailerDetails();
+      await loadMedicines();
+    };
+
 
     // Logout button functionality
     document.getElementById('logoutBtn').addEventListener('click', function() {

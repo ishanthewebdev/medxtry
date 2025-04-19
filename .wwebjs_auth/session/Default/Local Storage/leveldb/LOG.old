@@ -1,3 +1,6 @@
-2025/04/19-17:59:42.339 44e0 Reusing MANIFEST C:\Users\ishan\Documents\MedX\MedX\medi-erp-whatsapp\.wwebjs_auth\session\Default\Local Storage\leveldb/MANIFEST-000001
-2025/04/19-17:59:42.359 44e0 Recovering log #34
-2025/04/19-17:59:42.369 44e0 Reusing old log C:\Users\ishan\Documents\MedX\MedX\medi-erp-whatsapp\.wwebjs_auth\session\Default\Local Storage\leveldb/000034.log 
+2025/04/19-22:39:41.383 1df8 Reusing MANIFEST C:\Users\ishan\Documents\MedX\MedX\medi-erp-whatsapp\.wwebjs_auth\session\Default\Local Storage\leveldb/MANIFEST-000001
+2025/04/19-22:39:41.396 1df8 Recovering log #34
+2025/04/19-22:39:41.417 1df8 Reusing old log C:\Users\ishan\Documents\MedX\MedX\medi-erp-whatsapp\.wwebjs_auth\session\Default\Local Storage\leveldb/000034.log 
+2025/04/19-22:54:23.198 3df8 Level-0 table #37: started
+2025/04/19-22:54:23.214 3df8 Level-0 table #37: 14019 bytes OK
+2025/04/19-22:54:23.218 3df8 Delete type=0 #34
