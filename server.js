@@ -402,28 +402,26 @@ app.get('/sales-data', (req, res) => {
     return res.status(404).json({ success: false, message: 'No sales data found for this retailer' });
   }
 
-  const salesByDate = {};
+  const salesByMedicine = {};
+
+  const stats = fs.statSync(retailerCustomerCsvPath);
+  const modifiedDate = stats.mtime.toISOString().split('T')[0]; // YYYY-MM-DD
 
   fs.createReadStream(retailerCustomerCsvPath)
     .pipe(csvParser())
     .on('data', (row) => {
-      // Assuming the CSV has a "Date" column or we can use file modification date as fallback
-      // Since current CSV does not have date, we will use file modification date for all rows
-      // For better tracking, date should be added when saving customer data
-      const stats = fs.statSync(retailerCustomerCsvPath);
-      const modifiedDate = stats.mtime.toISOString().split('T')[0]; // YYYY-MM-DD
-
+      const medicineName = row['Medicine Name'] || 'Unknown';
       const quantity = parseInt(row['Quantity'], 10) || 0;
-      if (!salesByDate[modifiedDate]) {
-        salesByDate[modifiedDate] = 0;
+      if (!salesByMedicine[medicineName]) {
+        salesByMedicine[medicineName] = 0;
       }
-      salesByDate[modifiedDate] += quantity;
+      salesByMedicine[medicineName] += quantity;
     })
     .on('end', () => {
-      // Convert salesByDate object to array sorted by date
-      const salesArray = Object.entries(salesByDate)
-        .map(([date, totalQuantity]) => ({ date, totalQuantity }))
-        .sort((a, b) => a.date.localeCompare(b.date));
+      // Convert salesByMedicine object to array sorted by medicine name
+      const salesArray = Object.entries(salesByMedicine)
+        .map(([medName, totalQuantity]) => ({ date: modifiedDate, medicineName: medName, totalQuantity }))
+        .sort((a, b) => a.medicineName.localeCompare(b.medicineName));
 
       res.json({ success: true, data: salesArray });
     })
