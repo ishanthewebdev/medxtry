@@ -7,13 +7,26 @@ class MedicineDB {
   constructor(dbPath = path.join(__dirname, 'medicines.db'), csvPath = path.join(__dirname, 'medicines.csv')) {
     this.dbPath = dbPath;
     this.csvPath = csvPath;
-    this.db = new sqlite3.Database(this.dbPath, (err) => {
-      if (err) {
-        console.error('Error opening database:', err.message);
-      } else {
-        console.log(`Connected to SQLite database at ${this.dbPath}.`);
-      }
+    this.db = null;
+    this.open();
+  }
+
+  open() {
+    if (this.db) {
+      return this.ready;
+    }
+    this.ready = new Promise((resolve, reject) => {
+      this.db = new sqlite3.Database(this.dbPath, (err) => {
+        if (err) {
+          console.error('Error opening database:', err.message);
+          reject(err);
+        } else {
+          console.log(`Connected to SQLite database at ${this.dbPath}.`);
+          resolve();
+        }
+      });
     });
+    return this.ready;
   }
 
   initialize() {

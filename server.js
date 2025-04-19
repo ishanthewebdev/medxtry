@@ -276,8 +276,12 @@ app.post('/deduct-medicine', async (req, res) => {
         'UPDATE medicines SET quantity = ? WHERE id = ?',
         [newQuantity, id],
         function(err) {
-          if (err) reject(err);
-          else resolve();
+          if (err) {
+            console.error('Error updating medicine quantity:', err);
+            reject(err);
+          } else {
+            resolve();
+          }
         }
       );
     });

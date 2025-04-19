@@ -82,5 +82,26 @@
     "shopKeeperName": "new testing",
     "shopName": "agency",
     "password": "qwerty1234"
+  },
+  {
+    "email": "forjee12@gmail.com",
+    "phone": "1223456789",
+    "shopKeeperName": "raju",
+    "shopName": "new raju",
+    "password": "qwerty1234"
+  },
+  {
+    "email": "forjee13@gmail.com",
+    "phone": "1323456789",
+    "shopKeeperName": "rajushop",
+    "shopName": "newrajushop",
+    "password": "qwerty1234"
+  },
+  {
+    "email": "forjee14@gmail.com",
+    "phone": "1423456789",
+    "shopKeeperName": "ishan",
+    "shopName": "ishan medical",
+    "password": "qwerty1234"
   }
 ]
