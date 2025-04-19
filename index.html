@@ -374,6 +374,51 @@ Thank you for choosing our service.`;
       sessionStorage.clear();
       window.location.href = 'login.html';
     });
+    // Handle medicine CSV upload form submission
+    document.getElementById('uploadCsvForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const retailerEmail = sessionStorage.getItem('retailerEmail');
+      if (!retailerEmail) {
+        alert('Retailer email not found. Please login again.');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      const fileInput = document.getElementById('medicineCsvFile');
+      if (fileInput.files.length === 0) {
+        alert('Please select a CSV file to upload.');
+        return;
+      }
+
+      const file = fileInput.files[0];
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('email', retailerEmail);
+
+      const uploadStatus = document.getElementById('uploadStatus');
+      uploadStatus.textContent = 'Uploading...';
+
+      try {
+        const response = await fetch('http://localhost:3000/upload-medicine-csv', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await response.json();
+        if (data.success) {
+          uploadStatus.textContent = 'Upload successful! Reloading medicines...';
+          await loadMedicines();
+          uploadStatus.textContent = 'Medicines updated from uploaded CSV.';
+          fileInput.value = ''; // Clear file input
+        } else {
+          uploadStatus.textContent = 'Upload failed: ' + (data.message || 'Unknown error');
+        }
+      } catch (err) {
+        console.error('Error uploading CSV:', err);
+        uploadStatus.textContent = 'Error uploading CSV.';
+      }
+    });
+
   </script>
 
 </body>

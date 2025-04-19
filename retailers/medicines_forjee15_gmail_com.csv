@@ -1,0 +1,501 @@
+Medicine Name,Manufacturing Date,Expiry Date,Company,Price,Quantity
+ishankidawai,18-08-2020,05-04-2022,Zydus,140,80
+Losartan 859mg,28-09-2023,27-05-2025,Biocon,226.35,67
+Atorvastatin 322mg,02-09-2021,09-05-2024,Biocon,76.12,21
+Paracetamol 506mg,27-10-2024,06-10-2026,Pfizer,250.52,20
+Losartan 580mg,18-05-2024,04-09-2025,Zydus,116.35,32
+Paracetamol 718mg,27-12-2021,17-10-2023,Biocon,445.01,71
+Metformin 349mg,22-08-2023,03-11-2025,Biocon,456.59,75
+Azithromycin 503mg,02-10-2021,24-02-2024,Cipla,234.31,88
+Losartan 930mg,09-06-2021,18-07-2022,Zydus,257.44,47
+Amlodipine 101mg,24-02-2021,20-08-2022,Lupin,294.41,96
+Omeprazole 565mg,17-08-2023,11-07-2026,Aurobindo,237.75,67
+Amoxicillin 245mg,07-01-2023,28-02-2024,Novartis,44.02,2
+Omeprazole 231mg,20-05-2020,03-05-2022,Zydus,187.15,22
+Amlodipine 162mg,20-02-2020,04-07-2022,Zydus,31.76,80
+Losartan 431mg,25-06-2022,27-08-2023,Dr. Reddy's,182.89,38
+Amoxicillin 383mg,13-06-2020,03-05-2022,Lupin,35.32,15
+Losartan 874mg,18-03-2024,03-09-2026,Sun Pharma,124.65,96
+Amoxicillin 750mg,08-02-2020,30-03-2021,Dr. Reddy's,480.51,43
+Cetrizine 707mg,10-07-2022,21-02-2025,Lupin,156.08,95
+Amoxicillin 599mg,05-02-2024,07-05-2026,Aurobindo,170.84,70
+Losartan 770mg,09-06-2023,01-05-2026,Dr. Reddy's,225.13,73
+Azithromycin 740mg,06-02-2022,04-11-2023,Biocon,306.08,56
+Cetrizine 338mg,22-12-2020,08-12-2023,Zydus,443.67,56
+Metformin 331mg,15-10-2024,18-05-2027,Aurobindo,354.35,39
+Cetrizine 569mg,09-07-2020,30-09-2022,Pfizer,470.33,74
+Amoxicillin 365mg,08-01-2020,14-06-2021,Lupin,451.57,10
+Azithromycin 958mg,15-12-2020,15-08-2022,Aurobindo,400.46,34
+Cetrizine 366mg,30-01-2023,04-08-2025,Biocon,310.46,12
+Atorvastatin 222mg,04-09-2021,17-03-2024,Cipla,73.04,86
+Azithromycin 769mg,20-09-2023,16-01-2026,Aurobindo,110.76,37
+Losartan 572mg,01-04-2020,16-11-2021,Biocon,163.08,28
+Azithromycin 564mg,09-03-2024,11-01-2026,Cipla,472.59,13
+Paracetamol 736mg,28-01-2020,27-12-2021,Glenmark,420.42,8
+Ibuprofen 402mg,13-08-2020,19-10-2022,Novartis,452.65,36
+Ibuprofen 745mg,21-05-2021,04-12-2023,Aurobindo,194.23,15
+Cetrizine 908mg,02-09-2024,10-01-2026,Aurobindo,165.57,19
+Ibuprofen 597mg,18-03-2023,30-06-2025,Lupin,403.58,83
+Amoxicillin 809mg,24-10-2020,04-04-2023,Sun Pharma,252.11,60
+Paracetamol 205mg,13-01-2022,16-08-2023,Biocon,262.23,20
+Ibuprofen 662mg,11-03-2023,24-07-2025,Cipla,250.59,64
+Metformin 848mg,29-09-2023,02-02-2025,Glenmark,453.97,1
+Paracetamol 308mg,10-05-2024,10-11-2026,Biocon,57.87,61
+Metformin 811mg,15-08-2020,29-03-2022,Sun Pharma,350.68,100
+Cetrizine 579mg,09-09-2021,22-10-2022,Aurobindo,429.27,75
+Amoxicillin 457mg,06-10-2024,11-06-2027,Glenmark,145.13,93
+Atorvastatin 546mg,07-11-2020,02-11-2022,Sun Pharma,290.64,1
+Omeprazole 996mg,12-10-2022,05-06-2025,Dr. Reddy's,381.27,52
+Amlodipine 136mg,03-11-2021,22-11-2022,Novartis,464.02,96
+Ibuprofen 999mg,08-02-2022,01-02-2025,Aurobindo,25.08,72
+Amlodipine 224mg,14-11-2022,10-03-2025,Dr. Reddy's,483.73,84
+Paracetamol 946mg,04-06-2021,13-09-2022,Biocon,32.26,66
+Cetrizine 922mg,30-04-2022,06-02-2024,Dr. Reddy's,415.58,41
+Amlodipine 263mg,26-02-2024,01-08-2026,Lupin,23.1,55
+Atorvastatin 888mg,01-06-2021,17-08-2022,Glenmark,408.19,55
+Atorvastatin 824mg,09-10-2020,02-06-2022,Pfizer,30.35,83
+Azithromycin 112mg,08-08-2020,14-01-2022,Dr. Reddy's,433.82,19
+Ibuprofen 422mg,08-09-2024,03-01-2026,Dr. Reddy's,302.47,92
+Paracetamol 410mg,13-09-2023,06-02-2025,Lupin,147.09,61
+Losartan 762mg,01-08-2022,20-12-2024,Glenmark,482.76,48
+Azithromycin 372mg,11-11-2023,17-04-2025,Lupin,45.73,53
+Omeprazole 685mg,03-01-2022,15-08-2024,Pfizer,216.68,34
+Cetrizine 373mg,15-03-2022,30-08-2023,Dr. Reddy's,59.76,52
+Paracetamol 995mg,02-03-2024,25-04-2025,Novartis,276.28,6
+Amlodipine 995mg,17-10-2021,17-04-2023,Lupin,54.17,49
+Losartan 688mg,24-08-2024,18-05-2026,Cipla,209.96,88
+Amoxicillin 515mg,09-09-2023,19-11-2024,Aurobindo,270,5
+Paracetamol 708mg,04-07-2020,07-04-2023,Novartis,139.33,38
+Paracetamol 367mg,28-03-2023,30-10-2024,Pfizer,136.91,49
+Ibuprofen 153mg,06-05-2021,10-12-2023,Sun Pharma,457.99,7
+Paracetamol 225mg,29-06-2020,16-06-2022,Dr. Reddy's,443.16,36
+Omeprazole 899mg,12-12-2020,28-03-2022,Dr. Reddy's,38.15,54
+Cetrizine 189mg,21-05-2020,13-12-2021,Biocon,329.6,86
+Omeprazole 414mg,12-04-2023,17-02-2026,Glenmark,348.41,74
+Azithromycin 603mg,23-10-2023,30-06-2026,Dr. Reddy's,145.57,82
+Amlodipine 535mg,25-04-2024,12-11-2025,Lupin,169.34,22
+Metformin 378mg,16-11-2024,24-12-2026,Novartis,368.66,52
+Ibuprofen 368mg,07-06-2022,30-09-2023,Zydus,172.32,24
+Cetrizine 810mg,23-11-2020,17-07-2022,Pfizer,258.48,61
+Atorvastatin 811mg,10-03-2022,28-09-2024,Sun Pharma,228.76,16
+Amoxicillin 410mg,08-05-2023,17-04-2026,Glenmark,203.95,56
+Losartan 649mg,05-07-2024,09-10-2025,Novartis,114.08,58
+Atorvastatin 230mg,29-12-2020,19-01-2023,Biocon,396.73,87
+Amlodipine 468mg,25-06-2021,31-10-2022,Sun Pharma,458.91,85
+Paracetamol 449mg,27-09-2021,27-06-2023,Glenmark,316.11,50
+Omeprazole 795mg,22-10-2024,30-07-2026,Sun Pharma,358.05,10
+Omeprazole 688mg,17-07-2022,02-08-2023,Sun Pharma,176.22,11
+Losartan 427mg,02-08-2021,04-01-2023,Lupin,297.92,75
+Cetrizine 936mg,02-12-2020,20-08-2023,Pfizer,450.3,83
+Amlodipine 765mg,05-10-2022,19-05-2024,Cipla,113.18,16
+Atorvastatin 695mg,01-07-2024,03-10-2025,Pfizer,391.78,40
+Losartan 664mg,01-06-2024,19-09-2026,Sun Pharma,404.66,11
+Cetrizine 759mg,21-07-2020,05-11-2021,Dr. Reddy's,142.51,59
+Amoxicillin 167mg,03-01-2020,08-03-2021,Glenmark,382.08,93
+Atorvastatin 465mg,14-04-2023,17-01-2026,Lupin,292.82,12
+Cetrizine 148mg,28-09-2021,30-08-2024,Glenmark,47.98,79
+Losartan 644mg,24-04-2024,28-03-2026,Lupin,496.13,52
+Paracetamol 348mg,16-06-2024,27-08-2025,Pfizer,484.52,82
+Omeprazole 771mg,02-02-2020,30-05-2022,Zydus,222.22,31
+Omeprazole 347mg,22-09-2020,06-12-2022,Lupin,229.44,89
+Losartan 195mg,11-09-2020,06-06-2022,Biocon,343.36,63
+Losartan 173mg,11-10-2023,12-03-2026,Sun Pharma,211.38,65
+Paracetamol 951mg,12-03-2023,04-07-2024,Zydus,257.92,30
+Atorvastatin 281mg,23-01-2024,28-02-2025,Pfizer,365.09,28
+Omeprazole 245mg,25-06-2022,23-12-2023,Pfizer,94.09,11
+Amlodipine 538mg,28-02-2022,08-03-2023,Cipla,344.11,52
+Paracetamol 509mg,03-02-2023,17-09-2024,Biocon,268.45,78
+Amoxicillin 373mg,14-08-2023,24-12-2025,Dr. Reddy's,313.48,99
+Atorvastatin 306mg,25-02-2020,28-07-2021,Pfizer,249.17,93
+Atorvastatin 569mg,19-09-2024,19-04-2026,Sun Pharma,166.64,22
+Azithromycin 371mg,15-08-2020,17-09-2022,Aurobindo,30.01,24
+Atorvastatin 295mg,14-06-2020,09-09-2021,Cipla,147.76,98
+Losartan 259mg,16-06-2021,28-03-2024,Dr. Reddy's,322.8,24
+Amoxicillin 455mg,03-12-2020,20-06-2023,Dr. Reddy's,210.91,95
+Ibuprofen 660mg,15-09-2023,14-09-2025,Biocon,409.37,26
+Metformin 199mg,04-07-2024,21-10-2025,Biocon,434.7,44
+Metformin 964mg,30-09-2020,05-07-2022,Zydus,414.88,25
+Omeprazole 939mg,25-09-2021,07-04-2023,Dr. Reddy's,40.31,42
+Omeprazole 346mg,23-03-2020,19-11-2021,Biocon,494.66,70
+Amoxicillin 563mg,01-06-2024,14-01-2027,Dr. Reddy's,155.77,91
+Cetrizine 390mg,06-11-2021,19-04-2024,Glenmark,212.35,21
+Azithromycin 911mg,30-03-2020,16-06-2022,Lupin,340.39,94
+Cetrizine 147mg,06-10-2021,13-04-2023,Lupin,471.31,14
+Atorvastatin 791mg,12-04-2024,08-02-2027,Zydus,138.47,92
+Cetrizine 611mg,25-03-2021,21-02-2023,Glenmark,364.91,72
+Omeprazole 318mg,18-12-2021,15-09-2023,Cipla,216.96,21
+Paracetamol 403mg,24-04-2023,16-09-2024,Sun Pharma,383.6,93
+Atorvastatin 664mg,23-05-2021,15-10-2022,Zydus,106.03,62
+Amlodipine 694mg,21-05-2022,07-12-2023,Glenmark,248.99,71
+Omeprazole 902mg,26-10-2022,26-09-2024,Cipla,205.75,81
+Losartan 168mg,27-06-2021,10-11-2022,Glenmark,356.83,38
+Azithromycin 842mg,29-10-2023,23-09-2026,Lupin,215.73,89
+Paracetamol 439mg,24-06-2024,21-05-2027,Zydus,440.96,13
+Metformin 317mg,19-03-2023,12-04-2025,Aurobindo,262.45,10
+Losartan 762mg,14-03-2024,28-10-2026,Cipla,208.97,2
+Amlodipine 736mg,29-11-2023,09-04-2025,Biocon,59.42,75
+Amlodipine 488mg,05-03-2023,03-09-2024,Cipla,57.9,71
+Metformin 136mg,14-02-2024,13-07-2026,Sun Pharma,303,65
+Amlodipine 422mg,22-04-2024,19-02-2027,Novartis,34.81,62
+Omeprazole 273mg,13-05-2022,17-03-2025,Lupin,496.78,64
+Omeprazole 621mg,28-12-2023,09-08-2026,Biocon,279.3,64
+Omeprazole 607mg,03-04-2021,13-09-2023,Dr. Reddy's,482.69,5
+Amoxicillin 916mg,26-09-2023,19-02-2026,Glenmark,40.64,52
+Metformin 635mg,29-01-2024,02-05-2026,Aurobindo,409.77,90
+Azithromycin 290mg,02-02-2020,10-06-2021,Aurobindo,67.33,14
+Metformin 722mg,09-02-2024,15-11-2026,Zydus,243.68,35
+Ibuprofen 512mg,13-10-2023,09-02-2026,Sun Pharma,447.3,17
+Amoxicillin 166mg,09-05-2021,19-11-2023,Glenmark,95,58
+Metformin 544mg,08-08-2024,04-05-2026,Pfizer,40.78,99
+Paracetamol 903mg,30-04-2024,05-03-2027,Glenmark,373.6,58
+Cetrizine 952mg,16-06-2021,07-06-2023,Pfizer,418.82,50
+Omeprazole 955mg,11-06-2021,29-01-2023,Cipla,461.71,39
+Metformin 214mg,19-03-2023,10-02-2025,Zydus,275.44,70
+Atorvastatin 484mg,28-04-2024,13-05-2025,Aurobindo,251.63,67
+Atorvastatin 828mg,11-01-2023,21-11-2025,Glenmark,263.5,31
+Azithromycin 928mg,08-01-2020,28-04-2022,Biocon,319.69,27
+Amoxicillin 287mg,17-02-2022,28-10-2023,Sun Pharma,197.69,32
+Paracetamol 232mg,23-06-2022,30-04-2024,Cipla,478.51,34
+Metformin 244mg,12-08-2023,08-10-2025,Novartis,166.33,42
+Azithromycin 143mg,13-11-2021,21-03-2023,Pfizer,220.35,94
+Paracetamol 710mg,31-10-2021,17-11-2023,Lupin,88.97,68
+Atorvastatin 736mg,19-09-2023,06-11-2025,Zydus,52.62,16
+Ibuprofen 481mg,26-03-2022,11-07-2023,Aurobindo,143.32,45
+Amlodipine 610mg,25-05-2020,26-06-2021,Zydus,322.92,72
+Omeprazole 575mg,26-03-2024,17-12-2025,Aurobindo,97.21,45
+Paracetamol 738mg,15-11-2023,26-07-2025,Dr. Reddy's,62.38,40
+Metformin 559mg,02-03-2024,29-08-2025,Aurobindo,469.5,14
+Amlodipine 206mg,16-02-2022,05-12-2024,Pfizer,424.38,84
+Amoxicillin 207mg,28-08-2023,10-01-2026,Biocon,437.88,89
+Amoxicillin 549mg,17-05-2021,17-10-2023,Lupin,475.87,40
+Omeprazole 122mg,21-11-2024,22-10-2026,Sun Pharma,133.91,53
+Omeprazole 506mg,23-03-2023,17-06-2024,Zydus,327.27,54
+Losartan 649mg,18-03-2022,17-02-2024,Pfizer,241.07,79
+Omeprazole 969mg,08-06-2022,13-07-2024,Cipla,400.13,95
+Azithromycin 466mg,02-11-2024,25-08-2027,Pfizer,453.24,61
+Ibuprofen 608mg,11-05-2022,11-11-2024,Lupin,250.47,42
+Azithromycin 282mg,17-04-2021,12-07-2023,Pfizer,261.93,27
+Cetrizine 405mg,11-02-2023,04-04-2024,Zydus,407.2,22
+Amoxicillin 224mg,16-06-2023,10-05-2025,Glenmark,161.18,8
+Azithromycin 252mg,27-11-2020,24-04-2022,Dr. Reddy's,325.35,99
+Atorvastatin 144mg,16-08-2022,18-04-2025,Glenmark,307.25,41
+Cetrizine 989mg,18-10-2023,15-02-2026,Biocon,345.09,59
+Omeprazole 824mg,09-11-2021,21-03-2023,Novartis,91.52,1
+Atorvastatin 918mg,18-02-2024,02-12-2025,Novartis,168.08,77
+Losartan 431mg,14-08-2024,30-07-2026,Novartis,492.97,49
+Amlodipine 158mg,28-02-2020,28-12-2022,Sun Pharma,95.7,98
+Cetrizine 358mg,21-05-2022,27-12-2023,Biocon,392.14,33
+Losartan 452mg,26-03-2021,31-08-2023,Biocon,462.91,97
+Amlodipine 935mg,10-06-2022,29-10-2023,Aurobindo,158.3,58
+Paracetamol 302mg,07-04-2024,17-03-2027,Glenmark,186.71,46
+Losartan 153mg,02-03-2022,23-08-2023,Pfizer,91.42,59
+Amoxicillin 436mg,06-03-2023,30-04-2025,Cipla,261.46,17
+Metformin 378mg,03-04-2020,18-09-2022,Sun Pharma,406.41,77
+Amlodipine 458mg,02-05-2022,15-12-2023,Lupin,163.34,2
+Amoxicillin 384mg,08-10-2024,07-09-2026,Lupin,413.31,44
+Ibuprofen 403mg,09-02-2024,05-09-2025,Dr. Reddy's,464.82,54
+Paracetamol 491mg,28-06-2022,02-08-2024,Cipla,215.84,97
+Amoxicillin 596mg,13-05-2021,03-05-2023,Zydus,84.57,17
+Amoxicillin 156mg,08-04-2020,22-12-2021,Aurobindo,401.02,75
+Paracetamol 685mg,01-08-2022,18-03-2024,Cipla,435.24,53
+Cetrizine 113mg,20-02-2021,30-08-2022,Cipla,56.51,64
+Amoxicillin 391mg,01-10-2023,28-05-2026,Glenmark,316.43,88
+Azithromycin 411mg,03-09-2024,15-06-2027,Biocon,176.42,52
+Paracetamol 380mg,01-12-2021,11-10-2024,Glenmark,473.99,11
+Amlodipine 200mg,17-06-2020,18-07-2021,Lupin,372.69,30
+Amoxicillin 654mg,28-01-2022,30-08-2023,Zydus,402.29,52
+Losartan 348mg,09-10-2022,02-08-2024,Pfizer,167.49,55
+Cetrizine 741mg,10-03-2021,29-10-2022,Dr. Reddy's,265.27,43
+Ibuprofen 937mg,23-02-2023,13-01-2026,Lupin,457.75,65
+Cetrizine 555mg,25-07-2022,06-01-2025,Zydus,180.17,59
+Atorvastatin 732mg,02-09-2021,14-10-2023,Lupin,301.82,96
+Omeprazole 637mg,19-01-2024,26-04-2025,Glenmark,70.66,98
+Amoxicillin 457mg,09-05-2024,03-02-2026,Aurobindo,246.65,78
+Amoxicillin 820mg,16-12-2022,20-08-2025,Aurobindo,380.87,14
+Amoxicillin 797mg,05-10-2024,06-11-2026,Dr. Reddy's,389.99,53
+Ibuprofen 367mg,22-08-2021,12-09-2023,Sun Pharma,189.01,71
+Azithromycin 519mg,31-08-2022,07-09-2024,Pfizer,405.21,10
+Amoxicillin 224mg,30-11-2022,10-12-2023,Lupin,239.1,18
+Metformin 381mg,29-06-2024,16-01-2027,Aurobindo,78.25,77
+Cetrizine 644mg,25-05-2020,06-08-2022,Dr. Reddy's,337.49,22
+Ibuprofen 765mg,21-06-2021,21-01-2024,Cipla,292.64,36
+Ibuprofen 930mg,21-12-2023,04-04-2025,Glenmark,325.81,30
+Ibuprofen 296mg,29-05-2023,15-08-2025,Sun Pharma,142.57,73
+Amlodipine 733mg,27-06-2023,23-02-2026,Sun Pharma,285.36,58
+Azithromycin 332mg,29-05-2024,12-06-2026,Cipla,344.23,91
+Cetrizine 239mg,07-05-2020,18-05-2021,Dr. Reddy's,367.14,91
+Ibuprofen 168mg,27-09-2024,19-05-2026,Lupin,271.55,66
+Omeprazole 659mg,14-11-2020,18-01-2023,Aurobindo,218.79,76
+Metformin 937mg,22-07-2024,09-04-2026,Novartis,482.13,39
+Ibuprofen 573mg,30-07-2020,22-06-2022,Aurobindo,312.12,8
+Amoxicillin 210mg,01-10-2024,02-03-2026,Biocon,252.09,60
+Atorvastatin 760mg,11-07-2024,08-01-2027,Lupin,84.22,46
+Losartan 832mg,30-05-2024,06-07-2026,Cipla,282.12,95
+Omeprazole 950mg,02-09-2024,07-01-2027,Sun Pharma,413.7,90
+Azithromycin 642mg,08-10-2023,07-05-2026,Pfizer,414.26,95
+Atorvastatin 557mg,30-01-2021,15-10-2022,Cipla,157.22,89
+Paracetamol 595mg,19-07-2024,09-04-2026,Dr. Reddy's,398.65,14
+Losartan 309mg,31-12-2021,07-05-2023,Biocon,275.66,82
+Metformin 559mg,22-09-2020,04-08-2023,Biocon,353.52,53
+Atorvastatin 161mg,13-07-2023,20-07-2025,Novartis,399.04,98
+Amoxicillin 653mg,10-12-2020,17-06-2023,Zydus,450.16,89
+Ibuprofen 979mg,01-03-2021,21-07-2022,Biocon,259.41,69
+Amoxicillin 128mg,10-04-2021,12-04-2023,Pfizer,390.54,93
+Cetrizine 401mg,04-06-2022,10-02-2025,Dr. Reddy's,468.82,63
+Losartan 192mg,30-01-2024,08-12-2026,Lupin,470.11,95
+Omeprazole 499mg,29-04-2021,08-04-2024,Sun Pharma,335.61,30
+Azithromycin 999mg,09-09-2022,10-07-2024,Novartis,474.86,20
+Amlodipine 745mg,15-10-2022,22-09-2024,Cipla,62.62,10
+Amoxicillin 156mg,15-04-2022,03-01-2025,Biocon,301.65,75
+Azithromycin 618mg,29-01-2020,18-11-2022,Sun Pharma,126.61,80
+Paracetamol 500mg,11-12-2021,02-06-2023,Lupin,213.14,62
+Losartan 493mg,27-08-2020,28-12-2021,Glenmark,201.03,46
+Amlodipine 326mg,18-11-2023,24-03-2026,Glenmark,229.8,67
+Cetrizine 964mg,10-06-2023,10-05-2025,Biocon,104.69,86
+Azithromycin 149mg,07-03-2020,20-10-2022,Cipla,42.27,17
+Azithromycin 624mg,05-07-2020,05-07-2023,Aurobindo,389.62,30
+Amoxicillin 114mg,27-10-2023,09-10-2026,Sun Pharma,121.12,36
+Atorvastatin 135mg,26-12-2021,28-09-2024,Aurobindo,55.01,42
+Amlodipine 831mg,26-09-2024,15-06-2027,Biocon,492.85,5
+Atorvastatin 295mg,16-07-2023,17-09-2024,Sun Pharma,64.38,29
+Amoxicillin 877mg,06-02-2020,10-09-2021,Novartis,454.8,62
+Amoxicillin 440mg,06-06-2023,01-04-2026,Pfizer,243.07,66
+Amoxicillin 530mg,24-08-2024,29-03-2027,Pfizer,481.35,57
+Atorvastatin 229mg,11-04-2022,30-04-2024,Cipla,74.49,68
+Atorvastatin 928mg,07-10-2020,29-11-2022,Zydus,382.41,53
+Paracetamol 602mg,11-03-2022,25-03-2023,Glenmark,27.5,91
+Ibuprofen 150mg,26-07-2021,29-04-2023,Biocon,434.44,53
+Losartan 170mg,20-03-2023,16-10-2024,Zydus,88.79,25
+Cetrizine 428mg,21-11-2024,11-04-2027,Glenmark,269.32,26
+Losartan 147mg,24-07-2024,14-04-2027,Glenmark,229.8,82
+Losartan 639mg,12-09-2022,02-04-2024,Dr. Reddy's,227.8,93
+Azithromycin 254mg,20-09-2023,28-05-2025,Glenmark,323.85,48
+Losartan 729mg,29-05-2024,11-03-2027,Lupin,152.91,93
+Amoxicillin 998mg,16-12-2022,18-07-2024,Lupin,397.58,57
+Cetrizine 990mg,27-06-2024,10-09-2025,Novartis,259.42,11
+Paracetamol 373mg,24-03-2020,06-01-2022,Aurobindo,198.6,74
+Atorvastatin 376mg,04-12-2020,02-07-2022,Sun Pharma,74.71,90
+Paracetamol 500mg,18-04-2021,16-03-2023,Lupin,228.25,1
+Cetrizine 152mg,27-02-2023,15-10-2024,Glenmark,343.3,85
+Azithromycin 768mg,11-10-2020,03-11-2022,Aurobindo,48.5,59
+Atorvastatin 151mg,14-05-2023,14-03-2025,Biocon,420.49,96
+Metformin 425mg,03-05-2021,26-02-2023,Cipla,119.59,12
+Azithromycin 199mg,24-08-2020,25-05-2022,Lupin,248.57,73
+Metformin 620mg,04-04-2022,22-04-2024,Glenmark,159.1,3
+Metformin 680mg,29-08-2023,16-06-2025,Pfizer,282.83,39
+Paracetamol 819mg,21-05-2023,06-09-2025,Novartis,130.19,91
+Azithromycin 535mg,24-09-2022,05-11-2023,Aurobindo,461.55,82
+Paracetamol 202mg,11-10-2023,10-01-2026,Zydus,485.31,46
+Cetrizine 105mg,21-09-2023,28-02-2025,Aurobindo,413.95,22
+Atorvastatin 271mg,23-11-2023,22-05-2026,Biocon,63.2,74
+Amlodipine 742mg,07-12-2020,30-05-2022,Pfizer,435.32,30
+Amlodipine 353mg,26-03-2023,30-07-2024,Lupin,298.1,64
+Amlodipine 157mg,20-12-2022,10-10-2024,Zydus,219.05,57
+Omeprazole 373mg,12-09-2023,12-06-2025,Glenmark,261.19,24
+Cetrizine 991mg,22-01-2024,12-05-2026,Zydus,267.25,65
+Atorvastatin 531mg,18-10-2020,08-09-2022,Biocon,453.24,82
+Metformin 753mg,26-06-2022,20-10-2023,Zydus,415.22,75
+Azithromycin 823mg,19-04-2024,21-09-2025,Biocon,58.03,59
+Atorvastatin 787mg,07-03-2023,14-06-2025,Novartis,391.69,10
+Atorvastatin 919mg,23-02-2024,23-07-2026,Lupin,59.6,90
+Omeprazole 674mg,12-03-2024,23-11-2026,Dr. Reddy's,420.41,82
+Metformin 173mg,12-02-2020,29-07-2021,Pfizer,33.55,27
+Azithromycin 595mg,19-09-2021,16-05-2024,Pfizer,489.97,23
+Metformin 573mg,19-02-2024,17-03-2025,Novartis,190.1,92
+Azithromycin 929mg,03-09-2024,31-05-2026,Dr. Reddy's,259.88,20
+Metformin 645mg,22-11-2023,09-02-2026,Dr. Reddy's,88.19,3
+Atorvastatin 835mg,13-11-2023,29-07-2025,Zydus,323.84,36
+Omeprazole 312mg,10-09-2024,08-10-2026,Sun Pharma,201.96,86
+Cetrizine 621mg,16-12-2023,25-01-2025,Zydus,308.62,79
+Ibuprofen 651mg,10-03-2023,05-05-2025,Zydus,82.46,92
+Atorvastatin 911mg,10-12-2024,08-12-2027,Cipla,186.03,58
+Amoxicillin 495mg,24-06-2023,30-05-2026,Sun Pharma,413.91,2
+Amoxicillin 662mg,16-10-2020,24-03-2022,Sun Pharma,486.6,50
+Omeprazole 467mg,14-01-2020,24-03-2021,Aurobindo,147.22,32
+Losartan 508mg,08-06-2023,05-04-2026,Aurobindo,99.63,56
+Atorvastatin 970mg,20-10-2021,04-07-2023,Dr. Reddy's,181.51,81
+Losartan 944mg,14-06-2023,01-06-2025,Pfizer,124.94,44
+Metformin 352mg,24-10-2021,11-09-2024,Biocon,225.13,59
+Cetrizine 776mg,16-06-2022,29-05-2024,Cipla,147.35,70
+Cetrizine 585mg,19-12-2021,12-07-2024,Lupin,200.95,32
+Azithromycin 105mg,19-12-2022,21-11-2024,Novartis,411.35,56
+Atorvastatin 436mg,21-10-2023,08-05-2026,Zydus,94.28,16
+Paracetamol 307mg,17-08-2024,17-09-2025,Novartis,107.1,7
+Ibuprofen 373mg,19-08-2023,15-06-2025,Pfizer,299.9,31
+Ibuprofen 140mg,13-01-2020,19-04-2021,Glenmark,195.48,46
+Cetrizine 102mg,26-03-2020,28-04-2021,Dr. Reddy's,203.96,77
+Amoxicillin 611mg,05-09-2022,13-02-2025,Pfizer,489.93,100
+Amoxicillin 373mg,30-06-2024,20-02-2027,Lupin,289.51,79
+Amoxicillin 468mg,31-03-2024,02-12-2025,Novartis,387.48,1
+Amlodipine 854mg,22-11-2022,10-03-2024,Glenmark,217.88,67
+Atorvastatin 822mg,23-06-2020,14-06-2023,Cipla,138.41,76
+Atorvastatin 912mg,26-12-2024,19-01-2026,Pfizer,185.04,21
+Amlodipine 266mg,27-04-2023,12-10-2025,Zydus,21.37,89
+Amlodipine 171mg,09-10-2021,29-10-2022,Dr. Reddy's,316.32,83
+Amlodipine 968mg,18-01-2020,07-03-2021,Glenmark,174.96,11
+Losartan 529mg,26-04-2024,15-02-2026,Glenmark,370.74,77
+Metformin 966mg,02-09-2021,21-08-2024,Sun Pharma,401.64,7
+Cetrizine 906mg,23-03-2023,17-02-2025,Lupin,147.5,13
+Ibuprofen 587mg,23-05-2024,24-10-2025,Pfizer,314.81,99
+Amoxicillin 373mg,29-06-2023,13-09-2024,Biocon,86.18,37
+Omeprazole 943mg,11-04-2023,26-12-2025,Aurobindo,240.87,97
+Cetrizine 738mg,20-09-2024,24-06-2027,Novartis,245.62,59
+Atorvastatin 835mg,16-12-2021,14-12-2023,Dr. Reddy's,496.47,41
+Atorvastatin 805mg,07-08-2020,11-10-2022,Zydus,29.58,34
+Cetrizine 710mg,02-06-2022,02-05-2025,Zydus,127.17,94
+Cetrizine 456mg,26-11-2021,23-12-2022,Novartis,424.5,22
+Amoxicillin 695mg,16-02-2024,12-11-2026,Cipla,172.67,22
+Metformin 947mg,03-09-2021,01-07-2023,Zydus,492.04,9
+Omeprazole 562mg,23-10-2020,05-11-2021,Novartis,319.68,4
+Ibuprofen 891mg,25-12-2020,16-08-2022,Cipla,395.6,37
+Cetrizine 440mg,28-02-2021,28-05-2022,Biocon,201.48,86
+Cetrizine 149mg,30-12-2020,29-08-2023,Sun Pharma,77.41,22
+Amoxicillin 944mg,26-02-2024,16-02-2027,Zydus,414.77,96
+Omeprazole 564mg,06-02-2021,28-07-2023,Aurobindo,293.96,14
+Azithromycin 246mg,28-02-2024,11-05-2025,Cipla,250,54
+Metformin 182mg,20-07-2020,16-01-2022,Aurobindo,242.27,81
+Amlodipine 348mg,07-12-2024,26-10-2026,Novartis,252.05,5
+Amlodipine 976mg,11-12-2022,27-03-2025,Dr. Reddy's,246.55,3
+Cetrizine 509mg,13-04-2023,02-03-2025,Pfizer,472.67,62
+Losartan 111mg,28-10-2023,25-08-2026,Glenmark,417.44,39
+Atorvastatin 405mg,25-03-2021,17-01-2023,Dr. Reddy's,119.97,22
+Losartan 686mg,26-06-2024,27-02-2027,Lupin,241.7,98
+Amlodipine 983mg,07-10-2020,25-02-2023,Glenmark,471.86,73
+Atorvastatin 595mg,22-06-2022,22-05-2025,Novartis,331.03,97
+Losartan 148mg,04-10-2022,21-08-2024,Cipla,96.69,34
+Ibuprofen 499mg,29-05-2022,17-02-2024,Cipla,163.81,45
+Atorvastatin 868mg,24-05-2024,13-02-2026,Lupin,434.21,71
+Azithromycin 474mg,17-12-2021,16-07-2024,Sun Pharma,250.23,12
+Cetrizine 611mg,14-11-2023,19-07-2025,Sun Pharma,282.21,96
+Atorvastatin 812mg,27-10-2023,09-06-2026,Biocon,40.47,12
+Paracetamol 446mg,01-05-2021,09-05-2023,Sun Pharma,220.54,1
+Amoxicillin 775mg,15-08-2023,13-03-2026,Zydus,489.04,74
+Atorvastatin 120mg,17-10-2021,14-07-2024,Aurobindo,39.19,18
+Ibuprofen 664mg,29-12-2024,14-10-2026,Glenmark,22.75,41
+Losartan 919mg,20-01-2021,14-03-2023,Biocon,225.89,13
+Paracetamol 772mg,09-01-2021,08-03-2023,Pfizer,89.66,27
+Omeprazole 865mg,30-01-2022,19-01-2025,Sun Pharma,230.84,95
+Cetrizine 140mg,29-06-2020,10-02-2023,Novartis,40.85,10
+Azithromycin 244mg,10-07-2023,28-02-2025,Lupin,95.91,72
+Azithromycin 751mg,28-03-2021,08-10-2023,Zydus,490.23,54
+Azithromycin 819mg,14-06-2021,15-10-2023,Glenmark,308.17,59
+Paracetamol 514mg,17-11-2024,24-04-2027,Sun Pharma,497.6,28
+Losartan 636mg,15-11-2024,18-09-2027,Zydus,138.61,55
+Losartan 514mg,12-11-2022,11-06-2024,Biocon,84.98,5
+Omeprazole 582mg,19-06-2024,11-04-2026,Pfizer,425.76,6
+Omeprazole 982mg,17-04-2022,22-12-2023,Cipla,317.37,48
+Losartan 588mg,07-10-2020,25-07-2023,Novartis,54.16,8
+Ibuprofen 188mg,06-03-2021,12-11-2022,Aurobindo,261.53,95
+Ibuprofen 986mg,01-11-2021,06-06-2023,Dr. Reddy's,102.38,23
+Amoxicillin 515mg,20-05-2023,15-01-2026,Lupin,462.55,8
+Atorvastatin 746mg,16-12-2022,26-01-2024,Sun Pharma,411.16,10
+Paracetamol 597mg,23-09-2022,02-11-2024,Pfizer,331.41,58
+Metformin 705mg,06-09-2021,11-03-2023,Lupin,241.68,94
+Amoxicillin 660mg,16-03-2023,09-07-2025,Dr. Reddy's,381.95,60
+Ibuprofen 511mg,14-01-2022,16-02-2023,Sun Pharma,119.3,65
+Metformin 444mg,01-07-2023,17-03-2025,Dr. Reddy's,122.93,4
+Metformin 712mg,10-03-2024,05-09-2025,Cipla,191.64,59
+Metformin 911mg,05-04-2023,20-01-2026,Pfizer,294.63,54
+Losartan 627mg,01-05-2024,01-04-2026,Dr. Reddy's,140.83,51
+Azithromycin 575mg,21-08-2022,22-01-2025,Sun Pharma,112.92,46
+Cetrizine 139mg,01-11-2020,30-04-2023,Dr. Reddy's,124.66,100
+Losartan 139mg,07-08-2024,02-09-2025,Biocon,384.06,29
+Amlodipine 568mg,07-04-2023,28-05-2025,Lupin,98.7,19
+Ibuprofen 973mg,05-07-2020,18-01-2022,Novartis,129.26,97
+Azithromycin 797mg,14-09-2024,26-03-2027,Dr. Reddy's,119.04,92
+Metformin 567mg,18-03-2022,04-02-2025,Lupin,490.27,98
+Atorvastatin 943mg,29-02-2024,18-11-2026,Aurobindo,174.54,93
+Paracetamol 219mg,03-03-2023,21-11-2024,Pfizer,80.67,41
+Ibuprofen 630mg,07-12-2022,24-03-2024,Cipla,346.91,43
+Metformin 990mg,01-12-2023,08-12-2024,Dr. Reddy's,451.45,31
+Amoxicillin 196mg,10-12-2022,28-12-2024,Lupin,197.12,40
+Atorvastatin 263mg,15-05-2023,06-11-2024,Pfizer,37.35,58
+Amlodipine 108mg,14-05-2021,27-01-2023,Glenmark,373.12,3
+Metformin 930mg,17-03-2023,07-07-2025,Lupin,494.8,94
+Paracetamol 939mg,20-08-2024,23-06-2026,Pfizer,54.75,37
+Omeprazole 424mg,21-10-2020,22-08-2023,Biocon,240.03,92
+Ibuprofen 870mg,10-11-2020,06-04-2023,Novartis,165.27,44
+Losartan 215mg,10-12-2021,23-02-2023,Biocon,123.14,24
+Atorvastatin 355mg,19-04-2023,11-04-2026,Sun Pharma,451.81,62
+Metformin 257mg,15-08-2021,07-01-2024,Novartis,449.93,6
+Ibuprofen 945mg,12-06-2023,30-09-2025,Sun Pharma,67.77,21
+Ibuprofen 306mg,23-08-2024,18-11-2026,Glenmark,22.91,15
+Azithromycin 721mg,16-01-2021,13-09-2023,Zydus,245.68,36
+Omeprazole 895mg,19-06-2020,27-06-2022,Glenmark,265.33,45
+Azithromycin 626mg,12-06-2020,24-01-2023,Biocon,383.14,99
+Amoxicillin 954mg,23-12-2024,01-01-2027,Zydus,173.69,57
+Cetrizine 649mg,26-04-2024,29-03-2026,Zydus,357.22,70
+Losartan 509mg,07-10-2020,21-02-2022,Lupin,15.59,95
+Paracetamol 904mg,30-04-2022,12-08-2023,Lupin,311.39,46
+Azithromycin 507mg,14-11-2022,16-09-2025,Glenmark,79.56,99
+Atorvastatin 901mg,17-10-2024,02-05-2026,Glenmark,10.48,86
+Omeprazole 369mg,06-11-2024,19-01-2027,Zydus,22.66,1
+Amlodipine 328mg,19-01-2023,09-05-2025,Novartis,344.39,16
+Metformin 550mg,07-08-2020,16-02-2022,Glenmark,181.89,42
+Metformin 289mg,11-10-2020,21-04-2023,Novartis,399.19,80
+Metformin 439mg,17-09-2023,12-06-2025,Cipla,185.2,78
+Atorvastatin 811mg,10-05-2021,13-07-2023,Novartis,471.63,83
+Azithromycin 593mg,17-10-2021,07-04-2023,Lupin,462.91,91
+Metformin 853mg,29-05-2022,06-11-2023,Dr. Reddy's,280.25,21
+Amoxicillin 586mg,06-03-2022,11-10-2024,Zydus,85.55,55
+Metformin 473mg,08-02-2023,10-11-2025,Pfizer,258.9,36
+Paracetamol 999mg,26-01-2020,06-07-2022,Glenmark,26.96,52
+Metformin 306mg,07-08-2024,20-05-2026,Zydus,27.79,92
+Paracetamol 379mg,13-06-2020,07-09-2021,Glenmark,490.41,72
+Azithromycin 689mg,08-02-2021,04-10-2022,Pfizer,399.83,56
+Atorvastatin 997mg,12-03-2024,08-04-2026,Biocon,281.69,79
+Cetrizine 512mg,07-11-2021,24-06-2023,Dr. Reddy's,275.04,27
+Azithromycin 898mg,29-11-2021,25-12-2023,Pfizer,386.19,82
+Amlodipine 706mg,09-07-2024,09-06-2027,Sun Pharma,371.87,41
+Ibuprofen 874mg,26-07-2022,03-01-2025,Biocon,57.36,58
+Ibuprofen 682mg,03-01-2023,06-10-2025,Lupin,153.34,65
+Azithromycin 250mg,28-05-2020,09-10-2022,Biocon,29.94,62
+Cetrizine 343mg,06-12-2022,28-03-2025,Pfizer,84.66,70
+Losartan 853mg,28-10-2020,17-09-2023,Zydus,254.79,30
+Ibuprofen 596mg,06-02-2021,29-09-2022,Dr. Reddy's,395.94,77
+Atorvastatin 192mg,22-10-2021,03-07-2024,Zydus,492,29
+Azithromycin 917mg,29-03-2020,17-08-2021,Glenmark,299.3,63
+Amlodipine 508mg,14-11-2024,02-10-2027,Novartis,444.16,22
+Atorvastatin 281mg,06-04-2020,13-02-2022,Zydus,115.73,90
+Omeprazole 736mg,26-12-2021,07-12-2024,Novartis,14.98,40
+Atorvastatin 146mg,17-04-2020,20-11-2021,Biocon,277.17,6
+Losartan 122mg,28-12-2024,27-06-2026,Pfizer,129.64,88
+Atorvastatin 642mg,19-08-2022,28-06-2025,Sun Pharma,130.65,11
+Atorvastatin 596mg,28-08-2020,18-01-2023,Aurobindo,201.57,88
+Azithromycin 244mg,01-09-2024,04-01-2026,Novartis,151.14,13
+Amoxicillin 814mg,03-11-2024,27-02-2027,Glenmark,285.75,43
+Paracetamol 813mg,29-10-2020,31-05-2023,Aurobindo,117.48,75
+Amlodipine 427mg,23-05-2021,10-03-2024,Lupin,95.6,99
+Omeprazole 275mg,21-11-2020,09-02-2022,Zydus,74.2,94
+Losartan 903mg,03-12-2022,01-08-2024,Zydus,144.96,85
+Omeprazole 234mg,16-09-2024,08-02-2027,Glenmark,187.76,10
+Ibuprofen 442mg,07-04-2023,05-08-2024,Novartis,251.12,23
+Cetrizine 933mg,05-02-2023,12-07-2024,Glenmark,387.8,99
+Amoxicillin 571mg,08-04-2023,09-03-2026,Sun Pharma,317.63,88
+Paracetamol 751mg,12-03-2024,24-09-2026,Zydus,250.03,45
+Omeprazole 140mg,19-07-2023,15-05-2025,Biocon,94.24,94
+Azithromycin 670mg,24-10-2024,01-05-2026,Lupin,401.11,30
+Ibuprofen 402mg,29-09-2022,13-11-2023,Aurobindo,487.1,91
+Azithromycin 125mg,27-12-2021,16-11-2024,Lupin,388.41,36
+Ibuprofen 116mg,03-06-2024,05-11-2026,Novartis,234.04,86
+Azithromycin 547mg,23-02-2023,03-09-2025,Cipla,69.76,77
+Amoxicillin 694mg,05-01-2020,08-11-2022,Lupin,192.62,87
+Atorvastatin 698mg,07-11-2020,24-02-2022,Aurobindo,433.42,61
+Ibuprofen 936mg,09-03-2020,23-04-2022,Glenmark,89.74,17
+Losartan 885mg,17-09-2024,09-04-2027,Biocon,171.61,59
+Metformin 558mg,26-01-2022,11-08-2024,Biocon,109.41,43
+Azithromycin 512mg,22-02-2024,23-07-2025,Biocon,95.41,49
+Omeprazole 752mg,02-02-2021,03-08-2023,Biocon,203.91,70
+Losartan 374mg,18-06-2024,11-11-2025,Pfizer,417.97,88
+Amoxicillin 450mg,14-05-2021,06-04-2024,Aurobindo,264,52
+Amlodipine 985mg,09-07-2024,22-12-2025,Dr. Reddy's,14.23,70
+Atorvastatin 948mg,18-04-2024,21-11-2025,Glenmark,178.59,42
+Cetrizine 203mg,30-09-2023,18-01-2025,Zydus,365.42,43
+Paracetamol 148mg,03-01-2022,29-10-2024,Biocon,25.7,66
+Paracetamol 961mg,06-03-2021,27-01-2023,Zydus,147.2,26
+Amoxicillin 171mg,24-10-2023,18-03-2025,Sun Pharma,434.03,63
+Ibuprofen 587mg,24-05-2021,14-04-2024,Lupin,220.01,87
+Atorvastatin 853mg,03-07-2023,05-01-2025,Lupin,212.12,42
+Atorvastatin 961mg,26-11-2023,29-05-2025,Pfizer,227.94,99
+Amlodipine 705mg,22-05-2022,13-12-2023,Cipla,95.43,89
+Omeprazole 603mg,15-07-2023,03-03-2026,Dr. Reddy's,147.51,23
