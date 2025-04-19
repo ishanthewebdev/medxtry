@@ -167,6 +167,15 @@
 
       <button type="submit">Send Message</button>
     </form>
+
+    <hr style="margin: 30px 0;" />
+
+    <h3>Upload Your Medicine CSV</h3>
+    <form id="uploadCsvForm">
+      <input type="file" id="medicineCsvFile" accept=".csv" required />
+      <button type="submit">Upload CSV</button>
+    </form>
+    <div id="uploadStatus" style="margin-top: 10px; font-weight: bold;"></div>
   </div>
 
   <script>

@@ -75,5 +75,12 @@
     "shopKeeperName": "asdfg",
     "shopName": "qwert",
     "password": "qwerty1234"
+  },
+  {
+    "email": "forjee11@gmail.com",
+    "phone": "1123456789",
+    "shopKeeperName": "new testing",
+    "shopName": "agency",
+    "password": "qwerty1234"
   }
 ]
