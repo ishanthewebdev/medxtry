@@ -160,6 +160,16 @@
             <h3 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">Search Results</h3>
             <ul id="resultsList" class="space-y-3 text-gray-700 dark:text-gray-300"></ul>
           </div>
+
+          <!-- Cart Section -->
+          <div id="cartSection" class="mt-6 bg-white dark:bg-dark-700 p-4 rounded-lg shadow-md max-h-96 overflow-y-auto hidden">
+            <h3 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">Your Cart</h3>
+            <ul id="cartList" class="space-y-3 text-gray-700 dark:text-gray-300"></ul>
+            <div class="mt-4 flex justify-between items-center">
+              <span id="cartTotal" class="font-bold text-lg text-gray-900 dark:text-white">Total: ₹0</span>
+              <button id="checkoutBtn" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">Checkout</button>
+            </div>
+          </div>
         </div>
 
         <!-- Categories -->
@@ -574,6 +584,9 @@
       resultsList.innerHTML = '';
       searchResultsDiv.classList.add('hidden');
 
+      // Hide cart section on new search
+      document.getElementById('cartSection').classList.add('hidden');
+
       if (!medicineName) {
         alert('Please enter a medicine name to search.');
         return;
@@ -593,11 +606,14 @@
           } else {
             data.forEach(item => {
               const li = document.createElement('li');
-              li.className = 'border-b border-gray-300 dark:border-gray-600 py-2';
+              li.className = 'border-b border-gray-300 dark:border-gray-600 py-2 flex justify-between items-center';
               li.innerHTML = `
-                <strong>${item.medicineName}</strong> - Price: ₹${item.price} - Quantity: ${item.quantity}<br/>
-                Retailer: ${item.retailerShopName} (${item.retailerName})<br/>
-                Location: ${item.retailerLocation}
+                <div>
+                  <strong>${item.medicineName}</strong> - Price: ₹${item.price} - Quantity: ${item.quantity}<br/>
+                  Retailer: ${item.retailerShopName} (${item.retailerName})<br/>
+                  Location: ${item.retailerLocation}
+                </div>
+                <button class="orderNowBtn bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 ml-4" data-medicine='${JSON.stringify(item).replace(/'/g, "&apos;")}'>Order Now</button>
               `;
               resultsList.appendChild(li);
             });
@@ -609,6 +625,110 @@
       } catch (error) {
         alert('Error during search: ' + error.message);
       }
+    });
+
+    // Cart data structure
+    const cart = [];
+
+    // Function to render cart items
+    function renderCart() {
+      const cartList = document.getElementById('cartList');
+      const cartSection = document.getElementById('cartSection');
+      const cartTotal = document.getElementById('cartTotal');
+
+      cartList.innerHTML = '';
+
+      if (cart.length === 0) {
+        cartList.innerHTML = '<li>Your cart is empty.</li>';
+        cartTotal.textContent = 'Total: ₹0';
+        cartSection.classList.add('hidden');
+        return;
+      }
+
+      let totalPrice = 0;
+
+      cart.forEach((item, index) => {
+        const li = document.createElement('li');
+        li.className = 'flex justify-between items-center border-b border-gray-300 dark:border-gray-600 py-2';
+
+        const itemInfo = document.createElement('div');
+        itemInfo.innerHTML = `
+          <strong>${item.medicineName}</strong> - ₹${item.price} x 
+          <input type="number" min="1" value="${item.quantity}" data-index="${index}" class="cartQtyInput w-16 text-center rounded border border-gray-300 dark:bg-dark-600 dark:text-white" />
+          <br/>
+          Retailer: ${item.retailerShopName} (${item.retailerName})
+        `;
+
+        const removeBtn = document.createElement('button');
+        removeBtn.textContent = 'Remove';
+        removeBtn.className = 'bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700 ml-4';
+        removeBtn.addEventListener('click', () => {
+          cart.splice(index, 1);
+          renderCart();
+        });
+
+        li.appendChild(itemInfo);
+        li.appendChild(removeBtn);
+        cartList.appendChild(li);
+
+        totalPrice += item.price * item.quantity;
+      });
+
+      cartTotal.textContent = `Total: ₹${totalPrice.toFixed(2)}`;
+      cartSection.classList.remove('hidden');
+
+      // Add event listeners for quantity inputs
+      document.querySelectorAll('.cartQtyInput').forEach(input => {
+        input.addEventListener('change', (e) => {
+          const idx = e.target.getAttribute('data-index');
+          let val = parseInt(e.target.value);
+          if (isNaN(val) || val < 1) {
+            val = 1;
+            e.target.value = val;
+          }
+          cart[idx].quantity = val;
+          renderCart();
+        });
+      });
+    }
+
+    // Event delegation for Order Now buttons
+    document.getElementById('resultsList').addEventListener('click', (e) => {
+      if (e.target && e.target.classList.contains('orderNowBtn')) {
+        const itemData = e.target.getAttribute('data-medicine');
+        if (!itemData) return;
+        let item;
+        try {
+          item = JSON.parse(itemData.replace(/&apos;/g, "'"));
+        } catch {
+          alert('Failed to parse item data');
+          return;
+        }
+
+        // Check if item already in cart
+        const existingIndex = cart.findIndex(ci => ci.medicineId === item.medicineId && ci.retailerEmail === item.retailerEmail);
+        if (existingIndex !== -1) {
+          cart[existingIndex].quantity += 1;
+        } else {
+          cart.push({ ...item, quantity: 1 });
+        }
+        renderCart();
+      }
+    });
+
+    // Checkout button click handler (currently just alert)
+    document.getElementById('checkoutBtn').addEventListener('click', () => {
+      if (cart.length === 0) {
+        alert('Your cart is empty.');
+        return;
+      }
+      // For now, just show cart contents
+      let orderSummary = 'Order Summary:\n';
+      cart.forEach(item => {
+        orderSummary += `${item.medicineName} x ${item.quantity} from ${item.retailerShopName}\n`;
+      });
+      alert(orderSummary);
+      // Future: Implement order submission flow
     });
   </script>
 </body>
