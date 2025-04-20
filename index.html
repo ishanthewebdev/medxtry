@@ -406,7 +406,14 @@ Thank you for choosing our service.`;
         const response = await fetch('http://localhost:3000/send-message', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone, message: fullMessage })
+          body: JSON.stringify({ 
+            phone, 
+            message: fullMessage,
+            retailerEmail,
+            customerName,
+            medicineName: med.name,
+            expiryDate: med.expiry_date
+          })
         });
         const data = await response.json();
         if (!data.success) {

@@ -76,27 +76,31 @@
         <button id="closeSidebar" class="md:hidden text-2xl">×</button>
       </div>
       <nav class="space-y-4 text-lg">
-        <a href="#" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-800 hover:text-yellow-300 transition">
+        <a href="#" id="dashboardTab" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-800 hover:text-yellow-300 transition">
           <span>🏠</span>
           <span>Dashboard</span>
         </a>
-        <a href="#" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-800 hover:text-yellow-300 transition">
+        <a href="#" id="searchTab" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-800 hover:text-yellow-300 transition">
           <span>🔍</span>
           <span>Search Medicines</span>
         </a>
-        <a href="#" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-800 hover:text-yellow-300 transition">
+        <a href="#" id="cartTab" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-800 hover:text-yellow-300 transition">
           <span>🛒</span>
           <span>Cart</span>
         </a>
-        <a href="#" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-800 hover:text-yellow-300 transition">
+        <a href="#" id="ordersTab" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-800 hover:text-yellow-300 transition">
           <span>📦</span>
           <span>Orders</span>
         </a>
-        <a href="#" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-800 hover:text-yellow-300 transition">
+        <a href="#" id="purchaseTab" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-800 hover:text-yellow-300 transition">
+          <span>🛍️</span>
+          <span>Purchase History</span>
+        </a>
+        <a href="#" id="profileTab" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-800 hover:text-yellow-300 transition">
           <span>👤</span>
           <span>Profile</span>
         </a>
-        <a href="#" class="flex items-center space-x-3 p-2 rounded-lg bg-indigo-700 dark:bg-indigo-800 text-yellow-300 transition">
+        <a href="#" id="chatbotTab" class="flex items-center space-x-3 p-2 rounded-lg bg-indigo-700 dark:bg-indigo-800 text-yellow-300 transition">
           <span>🤖</span>
           <span>Medi-ChatBot</span>
         </a>
@@ -109,63 +113,129 @@
           <span class="hidden dark:inline">☀️ Light Mode</span>
         </button>
       </div>
+      <!-- Logout Button -->
+      <div class="mt-6">
+        <button id="logoutButton" class="w-full p-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold">
+          Logout
+        </button>
+      </div>
     </aside>
 
     <!-- Main Content -->
     <main class="flex-1 p-6 md:p-10">
 
-      <!-- Welcome -->
-      <div class="mb-8 px-7 md:mb-10">
-        <h1 class="text-3xl md:text-4xl font-bold text-gray-800 dark:text-white">Welcome, Customer 👋</h1>
-        <p class="text-gray-600 dark:text-gray-300 mt-2">Find the right medicine with ease!</p>
-      </div>
+      <!-- Dashboard Content -->
+      <div id="dashboardContent">
+        <div class="mb-8 px-7 md:mb-10">
+          <h1 class="text-3xl md:text-4xl font-bold text-gray-800 dark:text-white">Welcome, Customer 👋</h1>
+          <p class="text-gray-600 dark:text-gray-300 mt-2">Find the right medicine with ease!</p>
+        </div>
 
-      <!-- Search Bar -->
-      <div class="mb-8 md:mb-10">
-        <div class="relative">
-          <input 
-            type="text" 
-            placeholder="Search for medicines..." 
-            class="w-full p-4 rounded-xl shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-dark-700 dark:text-white dark:border-dark-600 dark:placeholder-gray-400" 
-          />
-          <button class="absolute right-3 top-1/2 transform -translate-y-1/2 bg-indigo-600 text-white p-2 rounded-lg">
-            🔍
-          </button>
+        <!-- Search Bar -->
+        <div class="mb-8 md:mb-10">
+          <div class="relative">
+            <input 
+              type="text" 
+              placeholder="Search for medicines..." 
+              class="w-full p-4 rounded-xl shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-dark-700 dark:text-white dark:border-dark-600 dark:placeholder-gray-400" 
+            />
+            <button class="absolute right-3 top-1/2 transform -translate-y-1/2 bg-indigo-600 text-white p-2 rounded-lg">
+              🔍
+            </button>
+          </div>
+        </div>
+
+        <!-- Categories -->
+        <div class="mb-10">
+          <h2 class="text-xl md:text-2xl font-semibold mb-4 text-gray-700 dark:text-gray-200">Popular Categories</h2>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            <div class="category-card bg-white dark:bg-dark-700 p-4 md:p-6 rounded-xl shadow hover:shadow-lg transition cursor-pointer dark:text-white">
+              <div class="text-2xl mb-2">💊</div>
+              <h3 class="font-medium">Pain Relief</h3>
+            </div>
+            <div class="category-card bg-white dark:bg-dark-700 p-4 md:p-6 rounded-xl shadow hover:shadow-lg transition cursor-pointer dark:text-white">
+              <div class="text-2xl mb-2">🌿</div>
+              <h3 class="font-medium">Immunity</h3>
+            </div>
+            <div class="category-card bg-white dark:bg-dark-700 p-4 md:p-6 rounded-xl shadow hover:shadow-lg transition cursor-pointer dark:text-white">
+              <div class="text-2xl mb-2">🤧</div>
+              <h3 class="font-medium">Allergy</h3>
+            </div>
+            <div class="category-card bg-white dark:bg-dark-700 p-4 md:p-6 rounded-xl shadow hover:shadow-lg transition cursor-pointer dark:text-white">
+              <div class="text-2xl mb-2">💪</div>
+              <h3 class="font-medium">Vitamins</h3>
+            </div>
+          </div>
+        </div>
+
+        <!-- Health Insights -->
+        <div class="bg-white dark:bg-dark-700 p-6 rounded-xl shadow-lg">
+          <h2 class="text-2xl md:text-3xl font-extrabold pb-4 text-gray-800 dark:text-white">KNOW YOUR HEALTH INSIGHTS</h2>
+          <p 
+            class="text-lg md:text-xl underline cursor-pointer text-indigo-600 dark:text-indigo-400 hover:animate-pulse inline-block" 
+            onclick="handleClick()"
+          >
+            Try Medi-ChatBot →
+          </p>
         </div>
       </div>
 
-      <!-- Categories -->
-      <div class="mb-10">
-        <h2 class="text-xl md:text-2xl font-semibold mb-4 text-gray-700 dark:text-gray-200">Popular Categories</h2>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-          <div class="category-card bg-white dark:bg-dark-700 p-4 md:p-6 rounded-xl shadow hover:shadow-lg transition cursor-pointer dark:text-white">
-            <div class="text-2xl mb-2">💊</div>
-            <h3 class="font-medium">Pain Relief</h3>
-          </div>
-          <div class="category-card bg-white dark:bg-dark-700 p-4 md:p-6 rounded-xl shadow hover:shadow-lg transition cursor-pointer dark:text-white">
-            <div class="text-2xl mb-2">🌿</div>
-            <h3 class="font-medium">Immunity</h3>
-          </div>
-          <div class="category-card bg-white dark:bg-dark-700 p-4 md:p-6 rounded-xl shadow hover:shadow-lg transition cursor-pointer dark:text-white">
-            <div class="text-2xl mb-2">🤧</div>
-            <h3 class="font-medium">Allergy</h3>
-          </div>
-          <div class="category-card bg-white dark:bg-dark-700 p-4 md:p-6 rounded-xl shadow hover:shadow-lg transition cursor-pointer dark:text-white">
-            <div class="text-2xl mb-2">💪</div>
-            <h3 class="font-medium">Vitamins</h3>
-          </div>
+      <!-- Purchase History Content -->
+      <div id="purchaseContent" class="hidden">
+        <h2 class="text-2xl font-bold mb-4 text-gray-800 dark:text-white">Purchase History</h2>
+        <div id="purchaseList" class="overflow-x-auto">
+          <table class="min-w-full bg-white dark:bg-dark-700 rounded-lg shadow-md">
+            <thead>
+              <tr>
+                <th class="py-2 px-4 border-b border-gray-200 dark:border-gray-600 text-left text-gray-700 dark:text-gray-300">Medicine Name</th>
+                <th class="py-2 px-4 border-b border-gray-200 dark:border-gray-600 text-left text-gray-700 dark:text-gray-300">Quantity</th>
+                <th class="py-2 px-4 border-b border-gray-200 dark:border-gray-600 text-left text-gray-700 dark:text-gray-300">Expiry Date</th>
+                <th class="py-2 px-4 border-b border-gray-200 dark:border-gray-600 text-left text-gray-700 dark:text-gray-300">Message</th>
+              </tr>
+            </thead>
+            <tbody id="purchaseTableBody">
+              <!-- Purchase rows will be inserted here -->
+            </tbody>
+          </table>
         </div>
       </div>
 
-      <!-- Health Insights -->
-      <div class="bg-white dark:bg-dark-700 p-6 rounded-xl shadow-lg">
-        <h2 class="text-2xl md:text-3xl font-extrabold pb-4 text-gray-800 dark:text-white">KNOW YOUR HEALTH INSIGHTS</h2>
-        <p 
-          class="text-lg md:text-xl underline cursor-pointer text-indigo-600 dark:text-indigo-400 hover:animate-pulse inline-block" 
-          onclick="handleClick()"
-        >
-          Try Medi-ChatBot →
-        </p>
+      <!-- Profile Content -->
+      <div id="profileContent" class="hidden max-w-md mx-auto bg-white dark:bg-dark-700 p-6 rounded-xl shadow-lg">
+        <h2 class="text-2xl font-bold mb-4 text-gray-800 dark:text-white">Profile</h2>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-gray-700 dark:text-gray-300 font-semibold mb-1">Name:</label>
+            <p id="profileName" class="text-gray-900 dark:text-gray-100"></p>
+          </div>
+          <div>
+            <label class="block text-gray-700 dark:text-gray-300 font-semibold mb-1">Phone Number:</label>
+            <p id="profilePhone" class="text-gray-900 dark:text-gray-100"></p>
+          </div>
+          <div>
+            <label class="block text-gray-700 dark:text-gray-300 font-semibold mb-1">Email:</label>
+            <p id="profileEmail" class="text-gray-900 dark:text-gray-100"></p>
+          </div>
+          <div>
+            <h3 class="text-xl font-semibold mb-2 text-gray-800 dark:text-white">Reset Password</h3>
+            <form id="resetPasswordForm" class="space-y-4">
+              <div>
+                <label for="currentPassword" class="block text-gray-700 dark:text-gray-300 font-semibold mb-1">Current Password</label>
+                <input type="password" id="currentPassword" name="currentPassword" required class="w-full p-2 border border-gray-300 rounded-md dark:bg-dark-600 dark:text-white" />
+              </div>
+              <div>
+                <label for="newPassword" class="block text-gray-700 dark:text-gray-300 font-semibold mb-1">New Password</label>
+                <input type="password" id="newPassword" name="newPassword" required class="w-full p-2 border border-gray-300 rounded-md dark:bg-dark-600 dark:text-white" />
+              </div>
+              <div>
+                <label for="confirmNewPassword" class="block text-gray-700 dark:text-gray-300 font-semibold mb-1">Confirm New Password</label>
+                <input type="password" id="confirmNewPassword" name="confirmNewPassword" required class="w-full p-2 border border-gray-300 rounded-md dark:bg-dark-600 dark:text-white" />
+              </div>
+              <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">Reset Password</button>
+            </form>
+            <p id="resetPasswordMessage" class="mt-2 text-sm"></p>
+          </div>
+        </div>
       </div>
 
     </main>
@@ -205,7 +275,228 @@
       sidebar.classList.remove('sidebar-open');
       sidebarOverlay.classList.remove('sidebar-overlay-open');
     });
-    
+
+    // Tab navigation
+    const dashboardTab = document.getElementById('dashboardTab');
+    const searchTab = document.getElementById('searchTab');
+    const cartTab = document.getElementById('cartTab');
+    const ordersTab = document.getElementById('ordersTab');
+    const purchaseTab = document.getElementById('purchaseTab');
+    const profileTab = document.getElementById('profileTab');
+    const chatbotTab = document.getElementById('chatbotTab');
+
+    const dashboardContent = document.getElementById('dashboardContent');
+    const purchaseContent = document.getElementById('purchaseContent');
+
+    function showDashboard() {
+      dashboardContent.classList.remove('hidden');
+      purchaseContent.classList.add('hidden');
+      setActiveTab(dashboardTab);
+    }
+
+    function showPurchaseHistory() {
+      dashboardContent.classList.add('hidden');
+      purchaseContent.classList.remove('hidden');
+      setActiveTab(purchaseTab);
+      loadPurchaseHistory();
+    }
+
+    function setActiveTab(activeTab) {
+      [dashboardTab, searchTab, cartTab, ordersTab, purchaseTab, profileTab, chatbotTab].forEach(tab => {
+        tab.classList.remove('bg-indigo-700', 'dark:bg-indigo-800', 'text-yellow-300');
+        tab.classList.add('hover:bg-indigo-700', 'dark:hover:bg-indigo-800', 'hover:text-yellow-300');
+      });
+      activeTab.classList.add('bg-indigo-700', 'dark:bg-indigo-800', 'text-yellow-300');
+      activeTab.classList.remove('hover:bg-indigo-700', 'dark:hover:bg-indigo-800', 'hover:text-yellow-300');
+    }
+
+    purchaseTab.addEventListener('click', (e) => {
+      e.preventDefault();
+      showPurchaseHistory();
+    });
+
+    dashboardTab.addEventListener('click', (e) => {
+      e.preventDefault();
+      showDashboard();
+    });
+
+    // Load purchase history from API
+    async function loadPurchaseHistory() {
+      const email = sessionStorage.getItem('customerEmail');
+      if (!email) {
+        alert('Customer email not found in session. Please login again.');
+        window.location.href = '../login.html';
+        return;
+      }
+
+      try {
+        const response = await fetch(`http://localhost:3000/customer-purchases?email=${encodeURIComponent(email)}`);
+        const result = await response.json();
+        if (result.success) {
+          populatePurchaseTable(result.data);
+        } else {
+          alert('Failed to load purchase history: ' + result.message);
+        }
+      } catch (error) {
+        alert('Error loading purchase history: ' + error.message);
+      }
+    }
+
+    // Populate purchase table
+    function populatePurchaseTable(purchases) {
+      const tbody = document.getElementById('purchaseTableBody');
+      tbody.innerHTML = '';
+      if (purchases.length === 0) {
+        const tr = document.createElement('tr');
+        const td = document.createElement('td');
+        td.colSpan = 4;
+        td.className = 'text-center py-4 text-gray-600 dark:text-gray-300';
+        td.textContent = 'No purchase history found.';
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+        return;
+      }
+
+      purchases.forEach(purchase => {
+        const tr = document.createElement('tr');
+        tr.className = 'border-b border-gray-200 dark:border-gray-600';
+
+        const medicineTd = document.createElement('td');
+        medicineTd.className = 'py-2 px-4 text-gray-800 dark:text-gray-200';
+        medicineTd.textContent = purchase['Medicine Name'] || '';
+
+        const quantityTd = document.createElement('td');
+        quantityTd.className = 'py-2 px-4 text-gray-800 dark:text-gray-200';
+        quantityTd.textContent = purchase['Quantity'] || '';
+
+        const expiryTd = document.createElement('td');
+        expiryTd.className = 'py-2 px-4 text-gray-800 dark:text-gray-200';
+        expiryTd.textContent = purchase['Expiry Date'] || '';
+
+        const messageTd = document.createElement('td');
+        messageTd.className = 'py-2 px-4 text-gray-800 dark:text-gray-200';
+        messageTd.textContent = purchase['Message'] || '';
+
+        tr.appendChild(medicineTd);
+        tr.appendChild(quantityTd);
+        tr.appendChild(expiryTd);
+        tr.appendChild(messageTd);
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Logout button functionality
+    // Removed duplicate logout button event listener to fix redeclaration error
+
+    // Profile tab click handler
+    const profileTabElement = document.getElementById('profileTab');
+    if (profileTabElement) {
+      profileTabElement.addEventListener('click', (e) => {
+        e.preventDefault();
+        console.log('Profile tab clicked');
+        showProfile();
+      });
+    } else {
+      console.error('Profile tab element not found');
+    }
+
+    function showProfile() {
+      console.log('Showing profile content');
+      dashboardContent.classList.add('hidden');
+      purchaseContent.classList.add('hidden');
+      const profileContent = document.getElementById('profileContent');
+      if (profileContent) {
+        profileContent.classList.remove('hidden');
+      } else {
+        console.error('Profile content element not found');
+      }
+      setActiveTab(profileTabElement);
+      loadProfile();
+    }
+
+    // Load profile data from sessionStorage or API
+    function loadProfile() {
+      const name = sessionStorage.getItem('customerName') || '';
+      const phone = sessionStorage.getItem('customerPhone') || '';
+      const email = sessionStorage.getItem('customerEmail') || '';
+
+      console.log('Loading profile data:', { name, phone, email });
+
+      document.getElementById('profileName').textContent = name;
+      document.getElementById('profilePhone').textContent = phone;
+      document.getElementById('profileEmail').textContent = email;
+    }
+
+    // Logout button functionality
+    const logoutButton = document.getElementById('logoutButton');
+    logoutButton.addEventListener('click', () => {
+      sessionStorage.removeItem('loggedIn');
+      sessionStorage.removeItem('customerEmail');
+      sessionStorage.removeItem('customerName');
+      sessionStorage.removeItem('customerPhone');
+      window.location.href = '../login.html';
+    });
+
+    // Reset password form submission
+    const resetPasswordForm = document.getElementById('resetPasswordForm');
+    const resetPasswordMessage = document.getElementById('resetPasswordMessage');
+
+    resetPasswordForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      resetPasswordMessage.textContent = '';
+
+      const currentPassword = document.getElementById('currentPassword').value;
+      const newPassword = document.getElementById('newPassword').value;
+      const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+
+      if (newPassword !== confirmNewPassword) {
+        resetPasswordMessage.textContent = 'New passwords do not match.';
+        resetPasswordMessage.className = 'text-red-600 mt-2';
+        return;
+      }
+
+      const email = sessionStorage.getItem('customerEmail');
+      if (!email) {
+        resetPasswordMessage.textContent = 'User email not found. Please login again.';
+        resetPasswordMessage.className = 'text-red-600 mt-2';
+        return;
+      }
+
+      try {
+        const response = await fetch('http://localhost:3000/reset-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, currentPassword, newPassword })
+        });
+        const result = await response.json();
+        if (result.success) {
+          resetPasswordMessage.textContent = 'Password reset successful.';
+          resetPasswordMessage.className = 'text-green-600 mt-2';
+          resetPasswordForm.reset();
+        } else {
+          resetPasswordMessage.textContent = 'Password reset failed: ' + result.message;
+          resetPasswordMessage.className = 'text-red-600 mt-2';
+        }
+      } catch (error) {
+        resetPasswordMessage.textContent = 'Error resetting password: ' + error.message;
+        resetPasswordMessage.className = 'text-red-600 mt-2';
+      }
+    });
+
+    function handleClick() {
+      document.body.style.opacity = '0.9';
+      setTimeout(() => {
+        window.location.href = 'Medi-chatbot.html';
+      }, 150);
+    }
+  </script>
+</body>
+</html>
+
+    // Logout button functionality
+    // Removed duplicate logout button event listener to fix redeclaration error
+
     function handleClick() {
       document.body.style.opacity = '0.9';
       setTimeout(() => {

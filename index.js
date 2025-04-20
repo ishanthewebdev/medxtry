@@ -28,14 +28,42 @@ client.on('ready', () => {
   setInterval(checkExpiries, 24 * 60 * 60 * 1000);
 });
 
+
+const fs = require('fs');
+const path = require('path');
+
 // Add a customer and send a purchase message
-function addCustomer(name, phone, medicineName, expiryDateStr) {
+function addCustomer(name, phone, medicineName, expiryDateStr, retailerEmail) {
   const expiryDate = new Date(expiryDateStr);
   const customer = { name, phone, medicineName, expiryDate };
   customers.push(customer);
 
   const msg = `Hello ${name}, you have purchased "${medicineName}" which expires on ${expiryDate.toDateString()}.`;
   sendWhatsAppMessage(phone, msg);
+
+  if (!retailerEmail) {
+    console.warn('Retailer email not provided, skipping purchase history update.');
+    return;
+  }
+
+  const safeEmail = retailerEmail.replace(/[^a-zA-Z0-9]/g, '_');
+  const retailerCustomerCsvPath = path.join(__dirname, 'retailers', `customers_${safeEmail}.csv`);
+
+  const csvLine = `"${name}","","${phone}","${medicineName}","1","${expiryDateStr}","${msg.replace(/"/g, '""')}"\n`;
+
+  // Check if file exists, if not write headers
+  if (!fs.existsSync(retailerCustomerCsvPath)) {
+    const headers = '"Customer Name","Location","Phone","Medicine Name","Quantity","Expiry Date","Message"\n';
+    fs.writeFileSync(retailerCustomerCsvPath, headers);
+  }
+
+  fs.appendFile(retailerCustomerCsvPath, csvLine, (err) => {
+    if (err) {
+      console.error('Error writing customer data to CSV:', err);
+    } else {
+      console.log(`Purchase history updated for customer ${name} in ${retailerCustomerCsvPath}`);
+    }
+  });
 }
 
 // Send WhatsApp message

@@ -179,6 +179,11 @@
             window.location.href = 'index.html';
           } else if (userType === 'customer') {
             sessionStorage.setItem('customerEmail', email);
+            // Store name and phone from user object
+            if (result.user) {
+              sessionStorage.setItem('customerName', result.user.shopKeeperName || '');
+              sessionStorage.setItem('customerPhone', result.user.phone || '');
+            }
             window.location.href = 'customer/customer.html';
           }
         } else {

@@ -97,17 +97,57 @@ client.on('ready', () => {
 
 client.initialize();
 
-// API Endpoint to send a message
-app.post('/send-message', (req, res) => {
-  const { phone, message } = req.body;
+// API Endpoint to send a message and update purchase history
+app.post('/send-message', async (req, res) => {
+  const { phone, message, retailerEmail, customerName, medicineName, expiryDate } = req.body;
 
-  client.sendMessage(`${phone}@c.us`, message)
-    .then(response => {
-      res.json({ success: true, message: 'Message sent successfully!' });
-    })
-    .catch(err => {
-      res.status(500).json({ success: false, message: 'Failed to send message', error: err });
-    });
+  console.log('Received /send-message request with data:', { phone, message, retailerEmail, customerName, medicineName, expiryDate });
+
+  if (!phone || !message) {
+    console.log('Missing phone or message in request');
+    return res.status(400).json({ success: false, message: 'Missing phone or message' });
+  }
+
+  if (!client.info || !client.info.wid) {
+    console.log('WhatsApp client not ready');
+    return res.status(503).json({ success: false, message: 'WhatsApp client not ready' });
+  }
+
+  try {
+    console.log(`Sending message to ${phone}@c.us`);
+    const response = await client.sendMessage(`${phone}@c.us`, message);
+    console.log('Message sent successfully via WhatsApp API');
+
+    if (retailerEmail && customerName && medicineName && expiryDate) {
+      console.log('All required data present for purchase history update');
+
+      const safeEmail = retailerEmail.replace(/[^a-zA-Z0-9]/g, '_');
+      const retailerCustomerCsvPath = path.join(__dirname, 'retailers', `customers_${safeEmail}.csv`);
+
+      const csvLine = `"${customerName}","","${phone}","${medicineName}","1","${expiryDate}","${message.replace(/"/g, '""')}"\n`;
+
+      // Check if file exists, if not write headers
+      if (!fs.existsSync(retailerCustomerCsvPath)) {
+        console.log('Customer CSV file does not exist, creating with headers');
+        const headers = '"Customer Name","Location","Phone","Medicine Name","Quantity","Expiry Date","Message"\n';
+        fs.writeFileSync(retailerCustomerCsvPath, headers);
+      }
+
+      try {
+        fs.appendFileSync(retailerCustomerCsvPath, csvLine);
+        console.log(`Purchase history updated for customer ${customerName} in ${retailerCustomerCsvPath}`);
+      } catch (err) {
+        console.error('Error writing customer data to CSV:', err);
+      }
+    } else {
+      console.log('Insufficient data to update purchase history');
+    }
+
+    res.json({ success: true, message: 'Message sent successfully!' });
+  } catch (err) {
+    console.error('Failed to send message via WhatsApp API:', JSON.stringify(err, Object.getOwnPropertyNames(err)));
+    res.status(500).json({ success: false, message: 'Failed to send message', error: err });
+  }
 });
 
 app.post('/signup', async (req, res) => {
@@ -190,7 +230,9 @@ app.post('/login', (req, res) => {
       return res.status(401).json({ success: false, message: 'Invalid email or password' });
     }
 
-    res.json({ success: true, message: 'Login successful' });
+    // Return user details along with success message
+    const { password: _, ...userWithoutPassword } = user;
+    res.json({ success: true, message: 'Login successful', user: userWithoutPassword });
   });
 });
 
@@ -569,6 +611,105 @@ app.get('/sales-data', async (req, res) => {
       console.error('Error reading sales data CSV:', err);
       res.status(500).json({ success: false, message: 'Failed to read sales data', error: err.message });
     });
+});
+
+app.get('/customer-purchases', (req, res) => {
+  const { email, phone } = req.query;
+  if (!email && !phone) {
+    return res.status(400).json({ success: false, message: 'Missing email or phone parameter' });
+  }
+
+  const customersDir = path.join(__dirname, 'retailers');
+  const purchaseRecords = [];
+
+  fs.readdir(customersDir, (err, files) => {
+    if (err) {
+      console.error('Error reading retailers directory:', err);
+      return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+
+    const customerFiles = files.filter(f => f.startsWith('customers_') && f.endsWith('.csv'));
+    if (customerFiles.length === 0) {
+      return res.json({ success: true, data: [] });
+    }
+
+    let filesProcessed = 0;
+
+    customerFiles.forEach(file => {
+      const filePath = path.join(customersDir, file);
+      fs.createReadStream(filePath)
+        .pipe(csvParser())
+        .on('data', (row) => {
+          const customerEmail = row['Email'] || '';
+          const customerPhone = row['Phone'] || '';
+          if ((email && customerEmail.toLowerCase() === email.toLowerCase()) ||
+              (phone && customerPhone === phone)) {
+            purchaseRecords.push(row);
+          }
+        })
+        .on('end', () => {
+          filesProcessed++;
+          if (filesProcessed === customerFiles.length) {
+            res.json({ success: true, data: purchaseRecords });
+          }
+        })
+        .on('error', (error) => {
+          console.error('Error reading customer purchase CSV:', error);
+          res.status(500).json({ success: false, message: 'Failed to read purchase data', error: error.message });
+        });
+    });
+  });
+});
+
+app.get('/test', (req, res) => {
+  console.log('Received /test request');
+  res.json({ success: true, message: 'Test endpoint reached' });
+});
+
+app.post('/reset-password', (req, res) => {
+  const { email, currentPassword, newPassword } = req.body;
+  if (!email || !currentPassword || !newPassword) {
+    return res.status(400).json({ success: false, message: 'Missing email, currentPassword or newPassword' });
+  }
+
+  // Read customers.json to find the user
+  fs.readFile(CUSTOMERS_JSON_PATH, 'utf8', (err, data) => {
+    if (err) {
+      console.error('Error reading customers.json:', err);
+      return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+
+    let customers = [];
+    try {
+      customers = JSON.parse(data);
+    } catch (parseErr) {
+      console.error('Error parsing customers.json:', parseErr);
+      return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+
+    const userIndex = customers.findIndex(u => u.email.toLowerCase() === email.toLowerCase());
+    if (userIndex === -1) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    const user = customers[userIndex];
+    if (user.password !== currentPassword) {
+      return res.status(401).json({ success: false, message: 'Current password is incorrect' });
+    }
+
+    // Update password
+    customers[userIndex].password = newPassword;
+
+    // Save updated customers.json
+    fs.writeFile(CUSTOMERS_JSON_PATH, JSON.stringify(customers, null, 2), (writeErr) => {
+      if (writeErr) {
+        console.error('Error writing customers.json:', writeErr);
+        return res.status(500).json({ success: false, message: 'Failed to update password' });
+      }
+
+      res.json({ success: true, message: 'Password reset successful' });
+    });
+  });
 });
 
 app.listen(port, () => {
