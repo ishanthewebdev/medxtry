@@ -195,6 +195,20 @@ button:active {
         <button id="logoutBtn">Logout</button>
         <h1>Medicine ERP - WhatsApp Notifications</h1>
 
+        <h3>Retailer Location and Live Status</h3>
+        <form id="retailerStatusForm" style="margin-bottom: 20px;">
+          <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <input type="text" id="retailerLocation" placeholder="Enter your shop location" style="flex-grow: 1;" />
+            <button type="button" id="detectLocationBtn" style="flex-shrink: 0;">Detect Location</button>
+          </div>
+          <label style="display: flex; align-items: center; gap: 10px; color: #f0f4f8; font-weight: 600;">
+            <input type="checkbox" id="retailerLiveStatus" />
+            Set Shop as Live
+          </label>
+          <button type="submit" style="margin-top: 10px; width: 100%;">Update Status</button>
+          <div id="statusMessage" style="margin-top: 10px; font-weight: 700;"></div>
+        </form>
+
         <h3>Send Reminder to Customer</h3>
         <form id="messageForm">
           <input type="text" id="customerName" placeholder="Enter customer name" required />
@@ -252,7 +266,7 @@ button:active {
     &copy; 2024 MEDX
   </footer>
 
-  <script>
+    <script>
     window.addEventListener('load', () => {
     const overlay = document.querySelector('.brand-overlay');
     setTimeout(() => {
@@ -261,8 +275,10 @@ button:active {
   });
     let medicinesData = [];
     let retailerShopName = '';
+    let retailerLocation = '';
+    let retailerLiveStatus = false;
 
-    // Fetch retailer details including shopName
+    // Fetch retailer details including shopName, location, live status
     async function loadRetailerDetails() {
       let retailerEmail = sessionStorage.getItem('retailerEmail');
       if (retailerEmail) {
@@ -282,7 +298,13 @@ button:active {
         const data = await response.json();
         if (data.success) {
           retailerShopName = data.data.shopName || '';
-          console.log('Received retailer shopName:', retailerShopName);
+          retailerLocation = data.data.location || '';
+          retailerLiveStatus = data.data.live || false;
+          console.log('Received retailer details:', data.data);
+
+          // Set location and live status inputs
+          document.getElementById('retailerLocation').value = retailerLocation;
+          document.getElementById('retailerLiveStatus').checked = retailerLiveStatus;
         } else {
           console.warn('Failed to load retailer details');
         }
@@ -491,6 +513,93 @@ Thank you for choosing our service.`;
       await loadRetailerDetails();
       await loadMedicines();
     };
+
+    // Handle retailer status form submission
+    document.getElementById('retailerStatusForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const retailerEmail = sessionStorage.getItem('retailerEmail');
+      if (!retailerEmail) {
+        alert('Retailer email not found. Please login again.');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      const location = document.getElementById('retailerLocation').value.trim();
+      const live = document.getElementById('retailerLiveStatus').checked;
+
+      try {
+        const response = await fetch('http://localhost:3000/update-retailer-status', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: retailerEmail, location, live })
+        });
+        const data = await response.json();
+        const statusMessage = document.getElementById('statusMessage');
+        if (data.success) {
+          statusMessage.textContent = 'Status updated successfully.';
+          statusMessage.style.color = '#6ee7b7'; // success color
+        } else {
+          statusMessage.textContent = 'Failed to update status: ' + (data.message || '');
+          statusMessage.style.color = '#ff6b6b'; // error color
+        }
+      } catch (err) {
+        console.error('Error updating retailer status:', err);
+        const statusMessage = document.getElementById('statusMessage');
+        statusMessage.textContent = 'Error updating status.';
+        statusMessage.style.color = '#ff6b6b'; // error color
+      }
+    });
+
+    // Handle detect location button click
+    document.getElementById('detectLocationBtn').addEventListener('click', () => {
+      const statusMessage = document.getElementById('statusMessage');
+      if (!navigator.geolocation) {
+        statusMessage.textContent = 'Geolocation is not supported by your browser.';
+        statusMessage.style.color = '#ff6b6b';
+        return;
+      }
+      statusMessage.textContent = 'Detecting location...';
+      statusMessage.style.color = '#a3bffa';
+
+      navigator.geolocation.getCurrentPosition(async (position) => {
+        const { latitude, longitude } = position.coords;
+        // Use a reverse geocoding API to get address from coordinates
+        try {
+          const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+          const data = await response.json();
+          if (data && data.display_name) {
+            document.getElementById('retailerLocation').value = data.display_name;
+            statusMessage.textContent = 'Location detected and filled.';
+            statusMessage.style.color = '#6ee7b7';
+          } else {
+            document.getElementById('retailerLocation').value = `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`;
+            statusMessage.textContent = 'Location detected (coordinates).';
+            statusMessage.style.color = '#6ee7b7';
+          }
+        } catch (error) {
+          document.getElementById('retailerLocation').value = `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`;
+          statusMessage.textContent = 'Location detected (coordinates).';
+          statusMessage.style.color = '#6ee7b7';
+        }
+      }, (error) => {
+        switch(error.code) {
+          case error.PERMISSION_DENIED:
+            statusMessage.textContent = 'Permission denied for location access.';
+            break;
+          case error.POSITION_UNAVAILABLE:
+            statusMessage.textContent = 'Location information is unavailable.';
+            break;
+          case error.TIMEOUT:
+            statusMessage.textContent = 'Location request timed out.';
+            break;
+          default:
+            statusMessage.textContent = 'An unknown error occurred.';
+            break;
+        }
+        statusMessage.style.color = '#ff6b6b';
+      });
+    });
 
 
     // Logout button functionality

@@ -121,24 +121,95 @@ app.post('/send-message', async (req, res) => {
     if (retailerEmail && customerName && medicineName && expiryDate) {
       console.log('All required data present for purchase history update');
 
-      const safeEmail = retailerEmail.replace(/[^a-zA-Z0-9]/g, '_');
-      const retailerCustomerCsvPath = path.join(__dirname, 'retailers', `customers_${safeEmail}.csv`);
+      // Async function to check customer existence and update purchase history
+      const updatePurchaseHistoryAsync = async () => {
+        try {
+          const data = await fs.promises.readFile(CUSTOMERS_JSON_PATH, 'utf8');
+          let customers = [];
+          try {
+            customers = JSON.parse(data);
+          } catch (parseErr) {
+            console.error('Error parsing customers.json:', parseErr);
+            // Proceed to update purchase history anyway
+            await updatePurchaseHistory();
+            return;
+          }
 
-      const csvLine = `"${customerName}","","${phone}","${medicineName}","1","${expiryDate}","${message.replace(/"/g, '""')}"\n`;
+          const customerExists = customers.some(cust => {
+            const custPhone = cust.phone ? cust.phone.replace(/\D/g, '') : '';
+            const reqPhone = phone.replace(/\D/g, '');
 
-      // Check if file exists, if not write headers
-      if (!fs.existsSync(retailerCustomerCsvPath)) {
-        console.log('Customer CSV file does not exist, creating with headers');
-        const headers = '"Customer Name","Location","Phone","Medicine Name","Quantity","Expiry Date","Message"\n';
-        fs.writeFileSync(retailerCustomerCsvPath, headers);
-      }
+            // Compare last 10 digits to handle country code differences
+            const custPhoneLast10 = custPhone.slice(-10);
+            const reqPhoneLast10 = reqPhone.slice(-10);
 
-      try {
-        fs.appendFileSync(retailerCustomerCsvPath, csvLine);
-        console.log(`Purchase history updated for customer ${customerName} in ${retailerCustomerCsvPath}`);
-      } catch (err) {
-        console.error('Error writing customer data to CSV:', err);
-      }
+            return custPhoneLast10 === reqPhoneLast10;
+          });
+
+          if (customerExists) {
+            console.log('Customer exists in database, updating purchase history');
+            await updatePurchaseHistory();
+          } else {
+            console.log('Customer does not exist in database, skipping purchase history update');
+          }
+        } catch (err) {
+          console.error('Error reading customers.json:', err);
+          // Proceed to update purchase history anyway
+          await updatePurchaseHistory();
+        }
+      };
+
+      const updatePurchaseHistory = async () => {
+        const safeEmail = retailerEmail.replace(/[^a-zA-Z0-9]/g, '_');
+        const retailerCustomerCsvPath = path.join(__dirname, 'retailers', `customers_${safeEmail}.csv`);
+        const globalCustomerCsvPath = path.join(__dirname, 'retailers', `customers_global.csv`);
+
+        const csvLine = `"${customerName}","","${phone}","${medicineName}","1","${expiryDate}","${message.replace(/"/g, '""')}"\n`;
+
+        try {
+          // Update retailer-specific customer CSV
+          if (!fs.existsSync(retailerCustomerCsvPath)) {
+            console.log('Retailer customer CSV file does not exist, creating with headers');
+            const headers = '"Customer Name","Location","Phone","Medicine Name","Quantity","Expiry Date","Message"\n';
+            await fs.promises.writeFile(retailerCustomerCsvPath, headers);
+          }
+          await fs.promises.appendFile(retailerCustomerCsvPath, csvLine);
+          console.log(`Purchase history updated for customer ${customerName} in ${retailerCustomerCsvPath}`);
+
+          // Update global customer CSV only if phone number matches last 10 digits in customers.json
+          if (!fs.existsSync(globalCustomerCsvPath)) {
+            console.log('Global customer CSV file does not exist, creating with headers');
+            const headers = '"Customer Name","Location","Phone","Medicine Name","Quantity","Expiry Date","Message"\n';
+            await fs.promises.writeFile(globalCustomerCsvPath, headers);
+          }
+
+          // Read customers.json to verify phone number match
+          const customersData = await fs.promises.readFile(CUSTOMERS_JSON_PATH, 'utf8');
+          let customersList = [];
+          try {
+            customersList = JSON.parse(customersData);
+          } catch (parseErr) {
+            console.error('Error parsing customers.json:', parseErr);
+          }
+
+          const phoneNormalized = phone.replace(/\D/g, '').slice(-10);
+          const customerMatch = customersList.some(cust => {
+            const custPhone = cust.phone ? cust.phone.replace(/\D/g, '').slice(-10) : '';
+            return custPhone === phoneNormalized;
+          });
+
+          if (customerMatch) {
+            await fs.promises.appendFile(globalCustomerCsvPath, csvLine);
+            console.log(`Purchase history updated for customer ${customerName} in global customer CSV`);
+          } else {
+            console.log(`Phone number ${phone} not found in customers.json, skipping global CSV update`);
+          }
+        } catch (err) {
+          console.error('Error writing customer data to CSV:', err);
+        }
+      };
+
+      await updatePurchaseHistoryAsync();
     } else {
       console.log('Insufficient data to update purchase history');
     }
@@ -147,6 +218,21 @@ app.post('/send-message', async (req, res) => {
   } catch (err) {
     console.error('Failed to send message via WhatsApp API:', JSON.stringify(err, Object.getOwnPropertyNames(err)));
     res.status(500).json({ success: false, message: 'Failed to send message', error: err });
+  }
+});
+  
+// New endpoint to check if customers_global.csv exists and return its contents or status
+app.get('/check-global-purchase-history', async (req, res) => {
+  const globalCustomerCsvPath = path.join(__dirname, 'retailers', 'customers_global.csv');
+  try {
+    if (!fs.existsSync(globalCustomerCsvPath)) {
+      return res.json({ success: false, message: 'Global customer purchase history file does not exist' });
+    }
+    const data = await fs.promises.readFile(globalCustomerCsvPath, 'utf8');
+    res.json({ success: true, data });
+  } catch (err) {
+    console.error('Error reading global customer purchase history:', err);
+    res.status(500).json({ success: false, message: 'Failed to read global purchase history', error: err.message });
   }
 });
 
@@ -184,9 +270,9 @@ app.post('/signup', async (req, res) => {
       return res.status(400).json({ success: false, message: 'Email already registered' });
     }
 
-    // Add new user
+    // Add new user with live status and location for retailers
     const newUser = userType === 'retailer'
-      ? { email, phone, shopKeeperName, shopName, password }
+      ? { email, phone, shopKeeperName, shopName, password, live: false, location: null }
       : { email, phone, shopKeeperName, password };
 
     users.push(newUser);
@@ -200,6 +286,69 @@ app.post('/signup', async (req, res) => {
 
       res.json({ success: true, message: 'Signup successful' });
     });
+  });
+});
+
+// Endpoint to update retailer location and live status
+app.post('/update-retailer-status', (req, res) => {
+  const { email, location, live } = req.body;
+  if (!email || typeof live !== 'boolean') {
+    return res.status(400).json({ success: false, message: 'Missing email or live status' });
+  }
+
+  fs.readFile(RETAILERS_JSON_PATH, 'utf8', (err, data) => {
+    if (err) {
+      console.error('Error reading retailers.json:', err);
+      return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+
+    let retailers = [];
+    try {
+      retailers = JSON.parse(data);
+    } catch (parseErr) {
+      console.error('Error parsing retailers.json:', parseErr);
+      return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+
+    const retailerIndex = retailers.findIndex(r => r.email.toLowerCase() === email.toLowerCase());
+    if (retailerIndex === -1) {
+      return res.status(404).json({ success: false, message: 'Retailer not found' });
+    }
+
+    retailers[retailerIndex].live = live;
+    if (location) {
+      retailers[retailerIndex].location = location;
+    }
+
+    fs.writeFile(RETAILERS_JSON_PATH, JSON.stringify(retailers, null, 2), (writeErr) => {
+      if (writeErr) {
+        console.error('Error writing retailers.json:', writeErr);
+        return res.status(500).json({ success: false, message: 'Failed to update retailer status' });
+      }
+
+      res.json({ success: true, message: 'Retailer status updated successfully' });
+    });
+  });
+});
+
+// Endpoint to get all live retailers with location
+app.get('/live-retailers', (req, res) => {
+  fs.readFile(RETAILERS_JSON_PATH, 'utf8', (err, data) => {
+    if (err) {
+      console.error('Error reading retailers.json:', err);
+      return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+
+    let retailers = [];
+    try {
+      retailers = JSON.parse(data);
+    } catch (parseErr) {
+      console.error('Error parsing retailers.json:', parseErr);
+      return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+
+    const liveRetailers = retailers.filter(r => r.live === true);
+    res.json({ success: true, data: liveRetailers });
   });
 });
 
@@ -709,6 +858,86 @@ app.post('/reset-password', (req, res) => {
 
       res.json({ success: true, message: 'Password reset successful' });
     });
+  });
+});
+
+app.post('/search-medicine', async (req, res) => {
+  const { medicineName, location } = req.body;
+  if (!medicineName) {
+    return res.status(400).json({ success: false, message: 'Missing medicineName in request body' });
+  }
+
+  fs.readFile(RETAILERS_JSON_PATH, 'utf8', async (err, data) => {
+    if (err) {
+      console.error('Error reading retailers.json:', err);
+      return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+
+    let retailers = [];
+    try {
+      retailers = JSON.parse(data);
+    } catch (parseErr) {
+      console.error('Error parsing retailers.json:', parseErr);
+      return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+
+    // Filter live retailers
+    const liveRetailers = retailers.filter(r => r.live === true);
+
+    const sqlite3 = require('sqlite3').verbose();
+    const results = [];
+
+    // Helper function to query medicine DB for a retailer
+    const queryRetailerMedicines = (retailer) => {
+      return new Promise((resolve) => {
+        const safeEmail = retailer.email.replace(/[^a-zA-Z0-9]/g, '_');
+        const retailerDbPath = path.join(__dirname, 'retailers', `medicines_${safeEmail}.db`);
+
+        if (!fs.existsSync(retailerDbPath)) {
+          // No DB for this retailer, skip
+          return resolve();
+        }
+
+        const db = new sqlite3.Database(retailerDbPath, sqlite3.OPEN_READONLY, (dbErr) => {
+          if (dbErr) {
+            console.error(`Error opening DB for retailer ${retailer.email}:`, dbErr);
+            return resolve();
+          }
+        });
+
+        const searchTerm = `%${medicineName.toLowerCase()}%`;
+        const query = `SELECT id, name, price, quantity FROM medicines WHERE LOWER(name) LIKE ?`;
+
+        db.all(query, [searchTerm], (queryErr, rows) => {
+          if (queryErr) {
+            console.error(`Error querying medicines for retailer ${retailer.email}:`, queryErr);
+            db.close();
+            return resolve();
+          }
+
+          rows.forEach(row => {
+            results.push({
+              retailerEmail: retailer.email,
+              retailerName: retailer.shopKeeperName || '',
+              retailerShopName: retailer.shopName || '',
+              retailerLocation: retailer.location || '',
+              medicineId: row.id,
+              medicineName: row.name,
+              price: row.price,
+              quantity: row.quantity
+            });
+          });
+
+          db.close();
+          resolve();
+        });
+      });
+    };
+
+    // Query all live retailers in parallel
+    await Promise.all(liveRetailers.map(r => queryRetailerMedicines(r)));
+
+    res.json({ success: true, data: results });
   });
 });
 

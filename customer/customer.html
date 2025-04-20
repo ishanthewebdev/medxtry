@@ -136,12 +136,29 @@
           <div class="relative">
             <input 
               type="text" 
+              id="customerLocation"
+              placeholder="Enter your location" 
+              class="w-full p-4 rounded-xl shadow-md mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-dark-700 dark:text-white dark:border-dark-600 dark:placeholder-gray-400" 
+            />
+            <button type="button" id="detectCustomerLocationBtn" class="mb-4 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+              Detect Location
+            </button>
+            <input 
+              type="text" 
+              id="medicineSearchInput"
               placeholder="Search for medicines..." 
               class="w-full p-4 rounded-xl shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-dark-700 dark:text-white dark:border-dark-600 dark:placeholder-gray-400" 
             />
-            <button class="absolute right-3 top-1/2 transform -translate-y-1/2 bg-indigo-600 text-white p-2 rounded-lg">
+            <button id="medicineSearchBtn" class="absolute right-3 top-1/2 transform -translate-y-1/2 bg-indigo-600 text-white p-2 rounded-lg">
               🔍
             </button>
+          </div>
+          <div id="locationStatusMessage" class="text-sm mt-1"></div>
+
+          <!-- Search Results -->
+          <div id="searchResults" class="mt-6 bg-white dark:bg-dark-700 p-4 rounded-lg shadow-md max-h-96 overflow-y-auto hidden">
+            <h3 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">Search Results</h3>
+            <ul id="resultsList" class="space-y-3 text-gray-700 dark:text-gray-300"></ul>
           </div>
         </div>
 
@@ -291,12 +308,20 @@
     function showDashboard() {
       dashboardContent.classList.remove('hidden');
       purchaseContent.classList.add('hidden');
+      const profileContent = document.getElementById('profileContent');
+      if (profileContent) {
+        profileContent.classList.add('hidden');
+      }
       setActiveTab(dashboardTab);
     }
 
     function showPurchaseHistory() {
       dashboardContent.classList.add('hidden');
       purchaseContent.classList.remove('hidden');
+      const profileContent = document.getElementById('profileContent');
+      if (profileContent) {
+        profileContent.classList.add('hidden');
+      }
       setActiveTab(purchaseTab);
       loadPurchaseHistory();
     }
@@ -490,19 +515,101 @@
         window.location.href = 'Medi-chatbot.html';
       }, 150);
     }
-  </script>
-</body>
-</html>
+    // Detect customer location button click
+    document.getElementById('detectCustomerLocationBtn').addEventListener('click', () => {
+      const statusMessage = document.getElementById('locationStatusMessage');
+      if (!navigator.geolocation) {
+        statusMessage.textContent = 'Geolocation is not supported by your browser.';
+        statusMessage.style.color = 'red';
+        return;
+      }
+      statusMessage.textContent = 'Detecting location...';
+      statusMessage.style.color = 'blue';
 
-    // Logout button functionality
-    // Removed duplicate logout button event listener to fix redeclaration error
+      navigator.geolocation.getCurrentPosition(async (position) => {
+        const { latitude, longitude } = position.coords;
+        try {
+          const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+          const data = await response.json();
+          if (data && data.display_name) {
+            document.getElementById('customerLocation').value = data.display_name;
+            statusMessage.textContent = 'Location detected and filled.';
+            statusMessage.style.color = 'green';
+          } else {
+            document.getElementById('customerLocation').value = `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`;
+            statusMessage.textContent = 'Location detected (coordinates).';
+            statusMessage.style.color = 'green';
+          }
+        } catch (error) {
+          document.getElementById('customerLocation').value = `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`;
+          statusMessage.textContent = 'Location detected (coordinates).';
+          statusMessage.style.color = 'green';
+        }
+      }, (error) => {
+        switch(error.code) {
+          case error.PERMISSION_DENIED:
+            statusMessage.textContent = 'Permission denied for location access.';
+            break;
+          case error.POSITION_UNAVAILABLE:
+            statusMessage.textContent = 'Location information is unavailable.';
+            break;
+          case error.TIMEOUT:
+            statusMessage.textContent = 'Location request timed out.';
+            break;
+          default:
+            statusMessage.textContent = 'An unknown error occurred.';
+            break;
+        }
+        statusMessage.style.color = 'red';
+      });
+    });
 
-    function handleClick() {
-      document.body.style.opacity = '0.9';
-      setTimeout(() => {
-        window.location.href = 'Medi-chatbot.html';
-      }, 150);
-    }
+    // Medicine search button click handler
+    document.getElementById('medicineSearchBtn').addEventListener('click', async () => {
+      const medicineName = document.getElementById('medicineSearchInput').value.trim();
+      const location = document.getElementById('customerLocation').value.trim();
+      const resultsList = document.getElementById('resultsList');
+      const searchResultsDiv = document.getElementById('searchResults');
+
+      resultsList.innerHTML = '';
+      searchResultsDiv.classList.add('hidden');
+
+      if (!medicineName) {
+        alert('Please enter a medicine name to search.');
+        return;
+      }
+
+      try {
+        const response = await fetch('http://localhost:3000/search-medicine', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ medicineName, location })
+        });
+        const result = await response.json();
+        if (result.success) {
+          const data = result.data;
+          if (data.length === 0) {
+            resultsList.innerHTML = '<li>No retailers found with the searched medicine.</li>';
+          } else {
+            data.forEach(item => {
+              const li = document.createElement('li');
+              li.className = 'border-b border-gray-300 dark:border-gray-600 py-2';
+              li.innerHTML = `
+                <strong>${item.medicineName}</strong> - Price: ₹${item.price} - Quantity: ${item.quantity}<br/>
+                Retailer: ${item.retailerShopName} (${item.retailerName})<br/>
+                Location: ${item.retailerLocation}
+              `;
+              resultsList.appendChild(li);
+            });
+          }
+          searchResultsDiv.classList.remove('hidden');
+        } else {
+          alert('Search failed: ' + result.message);
+        }
+      } catch (error) {
+        alert('Error during search: ' + error.message);
+      }
+    });
   </script>
 </body>
 </html>
