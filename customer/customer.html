@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Customer Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            dark: {
+              900: '#0f172a',
+              800: '#1e293b',
+              700: '#334155',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+        position: fixed;
+        z-index: 50;
+        height: 100vh;
+        transition: transform 0.3s ease;
+      }
+      .sidebar-open {
+        transform: translateX(0);
+      }
+      .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0,0,0,0.5);
+        z-index: 40;
+      }
+      .sidebar-overlay-open {
+        display: block;
+      }
+    }
+    
+    .category-card {
+      transition: all 0.2s ease;
+    }
+    
+    .category-card:hover {
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body class="bg-gray-100 dark:bg-dark-900 font-sans transition-colors duration-200">
+
+  <!-- Mobile Menu Button -->
+  <button id="mobileMenuButton" class="md:hidden fixed top-4 left-4 z-30 p-2 rounded-lg bg-indigo-600 text-white shadow-lg">
+    ☰
+  </button>
+
+  <!-- Mobile Sidebar Overlay -->
+  <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+  <div class="flex min-h-screen">
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar bg-indigo-800 dark:bg-indigo-900 text-white w-64 p-6 space-y-6">
+      <div class="flex justify-between items-center mb-8">
+        <h2 class="text-3xl font-bold ">💊 MedX</h2>
+        <button id="closeSidebar" class="md:hidden text-2xl">×</button>
+      </div>
+      <nav class="space-y-4 text-lg">
+        <a href="#" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-800 hover:text-yellow-300 transition">
+          <span>🏠</span>
+          <span>Dashboard</span>
+        </a>
+        <a href="#" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-800 hover:text-yellow-300 transition">
+          <span>🔍</span>
+          <span>Search Medicines</span>
+        </a>
+        <a href="#" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-800 hover:text-yellow-300 transition">
+          <span>🛒</span>
+          <span>Cart</span>
+        </a>
+        <a href="#" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-800 hover:text-yellow-300 transition">
+          <span>📦</span>
+          <span>Orders</span>
+        </a>
+        <a href="#" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-800 hover:text-yellow-300 transition">
+          <span>👤</span>
+          <span>Profile</span>
+        </a>
+        <a href="#" class="flex items-center space-x-3 p-2 rounded-lg bg-indigo-700 dark:bg-indigo-800 text-yellow-300 transition">
+          <span>🤖</span>
+          <span>Medi-ChatBot</span>
+        </a>
+      </nav>
+      
+      <!-- Dark Mode Toggle -->
+      <div class=" bottom-6 left-6 right-6">
+        <button id="darkModeToggle" class="w-full p-2 rounded-lg bg-indigo-700 dark:bg-indigo-800 text-white flex items-center justify-center space-x-2">
+          <span class="dark:hidden">🌙 Dark Mode</span>
+          <span class="hidden dark:inline">☀️ Light Mode</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6 md:p-10">
+
+      <!-- Welcome -->
+      <div class="mb-8 px-7 md:mb-10">
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-800 dark:text-white">Welcome, Customer 👋</h1>
+        <p class="text-gray-600 dark:text-gray-300 mt-2">Find the right medicine with ease!</p>
+      </div>
+
+      <!-- Search Bar -->
+      <div class="mb-8 md:mb-10">
+        <div class="relative">
+          <input 
+            type="text" 
+            placeholder="Search for medicines..." 
+            class="w-full p-4 rounded-xl shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-dark-700 dark:text-white dark:border-dark-600 dark:placeholder-gray-400" 
+          />
+          <button class="absolute right-3 top-1/2 transform -translate-y-1/2 bg-indigo-600 text-white p-2 rounded-lg">
+            🔍
+          </button>
+        </div>
+      </div>
+
+      <!-- Categories -->
+      <div class="mb-10">
+        <h2 class="text-xl md:text-2xl font-semibold mb-4 text-gray-700 dark:text-gray-200">Popular Categories</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+          <div class="category-card bg-white dark:bg-dark-700 p-4 md:p-6 rounded-xl shadow hover:shadow-lg transition cursor-pointer dark:text-white">
+            <div class="text-2xl mb-2">💊</div>
+            <h3 class="font-medium">Pain Relief</h3>
+          </div>
+          <div class="category-card bg-white dark:bg-dark-700 p-4 md:p-6 rounded-xl shadow hover:shadow-lg transition cursor-pointer dark:text-white">
+            <div class="text-2xl mb-2">🌿</div>
+            <h3 class="font-medium">Immunity</h3>
+          </div>
+          <div class="category-card bg-white dark:bg-dark-700 p-4 md:p-6 rounded-xl shadow hover:shadow-lg transition cursor-pointer dark:text-white">
+            <div class="text-2xl mb-2">🤧</div>
+            <h3 class="font-medium">Allergy</h3>
+          </div>
+          <div class="category-card bg-white dark:bg-dark-700 p-4 md:p-6 rounded-xl shadow hover:shadow-lg transition cursor-pointer dark:text-white">
+            <div class="text-2xl mb-2">💪</div>
+            <h3 class="font-medium">Vitamins</h3>
+          </div>
+        </div>
+      </div>
+
+      <!-- Health Insights -->
+      <div class="bg-white dark:bg-dark-700 p-6 rounded-xl shadow-lg">
+        <h2 class="text-2xl md:text-3xl font-extrabold pb-4 text-gray-800 dark:text-white">KNOW YOUR HEALTH INSIGHTS</h2>
+        <p 
+          class="text-lg md:text-xl underline cursor-pointer text-indigo-600 dark:text-indigo-400 hover:animate-pulse inline-block" 
+          onclick="handleClick()"
+        >
+          Try Medi-ChatBot →
+        </p>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    // Dark mode toggle
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    darkModeToggle.addEventListener('click', () => {
+      document.documentElement.classList.toggle('dark');
+      localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
+    });
+    
+    // Check for saved preference or system preference
+    if (localStorage.getItem('darkMode') === 'true' || 
+        (!localStorage.getItem('darkMode') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    }
+    
+    // Mobile sidebar toggle
+    const mobileMenuButton = document.getElementById('mobileMenuButton');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    const closeSidebar = document.getElementById('closeSidebar');
+    
+    mobileMenuButton.addEventListener('click', () => {
+      sidebar.classList.add('sidebar-open');
+      sidebarOverlay.classList.add('sidebar-overlay-open');
+    });
+    
+    closeSidebar.addEventListener('click', () => {
+      sidebar.classList.remove('sidebar-open');
+      sidebarOverlay.classList.remove('sidebar-overlay-open');
+    });
+    
+    sidebarOverlay.addEventListener('click', () => {
+      sidebar.classList.remove('sidebar-open');
+      sidebarOverlay.classList.remove('sidebar-overlay-open');
+    });
+    
+    function handleClick() {
+      document.body.style.opacity = '0.9';
+      setTimeout(() => {
+        window.location.href = 'Medi-chatbot.html';
+      }, 150);
+    }
+  </script>
+</body>
+</html>

@@ -189,6 +189,11 @@ button:active {
     <h1>Signup</h1>
     <div id="message" class=""></div>
     <form id="signupForm">
+      <select id="userType" required style="margin-bottom: 15px; padding: 10px; border-radius: 8px; border: none; width: 100%; font-size: 1.1rem;">
+        <option value="" disabled selected>Select User Type</option>
+        <option value="retailer">Retailer</option>
+        <option value="customer">Customer</option>
+      </select>
       <input type="email" id="email" placeholder="Email" required />
       <input type="text" id="phone" placeholder="Phone Number" required />
       <input type="text" id="shopKeeperName" placeholder="Name" required />
@@ -206,40 +211,60 @@ button:active {
       overlay.style.display = 'none';
     }, 2500);
   });
-    document.getElementById('signupForm').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      const messageDiv = document.getElementById('message');
-      messageDiv.textContent = '';
-      messageDiv.className = '';
 
-      const email = document.getElementById('email').value.trim();
-      const phone = document.getElementById('phone').value.trim();
-      const shopKeeperName = document.getElementById('shopKeeperName').value.trim();
-      const shopName = document.getElementById('shopName').value.trim();
-      const password = document.getElementById('password').value;
+  // Show/hide shopName field based on userType
+  document.getElementById('userType').addEventListener('change', function() {
+    const userType = this.value;
+    const shopNameInput = document.getElementById('shopName');
+    if (userType === 'customer') {
+      shopNameInput.style.display = 'none';
+      shopNameInput.required = false;
+    } else {
+      shopNameInput.style.display = 'block';
+      shopNameInput.required = true;
+    }
+  });
 
-      try {
-        const response = await fetch('http://localhost:3000/signup', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, phone, shopKeeperName, shopName, password })
-        });
-        const result = await response.json();
-        if (result.success) {
-          messageDiv.textContent = 'Signup successful! Redirecting to login...';
-          messageDiv.className = 'success';
-          setTimeout(() => {
-            window.location.href = 'login.html';
-          }, 2000);
-        } else {
-          messageDiv.textContent = result.message || 'Signup failed.';
-          messageDiv.className = 'error';
-        }
-      } catch (error) {
-        messageDiv.textContent = 'Error connecting to server.';
+  document.getElementById('signupForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const messageDiv = document.getElementById('message');
+    messageDiv.textContent = '';
+    messageDiv.className = '';
+
+    const userType = document.getElementById('userType').value;
+    const email = document.getElementById('email').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const shopKeeperName = document.getElementById('shopKeeperName').value.trim();
+    const shopName = document.getElementById('shopName').value.trim();
+    const password = document.getElementById('password').value;
+
+    // For customers, ignore shopName
+    const signupData = userType === 'customer'
+      ? { userType, email, phone, shopKeeperName, password }
+      : { userType, email, phone, shopKeeperName, shopName, password };
+
+    try {
+      const response = await fetch('http://localhost:3000/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(signupData)
+      });
+      const result = await response.json();
+      if (result.success) {
+        messageDiv.textContent = 'Signup successful! Redirecting to login...';
+        messageDiv.className = 'success';
+        setTimeout(() => {
+          window.location.href = 'login.html';
+        }, 2000);
+      } else {
+        messageDiv.textContent = result.message || 'Signup failed.';
         messageDiv.className = 'error';
       }
-    });
+    } catch (error) {
+      messageDiv.textContent = 'Error connecting to server.';
+      messageDiv.className = 'error';
+    }
+  });
   </script>
 </body>
 </html>

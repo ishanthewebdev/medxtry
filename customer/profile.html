@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        // Load sidebar component
+        fetch('sidebar.html')
+          .then(response => response.text())
+          .then(html => {
+            document.body.insertAdjacentHTML('afterbegin', html);
+            // Initialize sidebar JS after loading
+            initSidebar();
+          });
+      
+        function initSidebar() {
+          // All your sidebar JavaScript logic here
+          const darkModeToggle = document.getElementById('darkModeToggle');
+          // ... rest of your sidebar code
+        }
+      </script>
+</head>
+<body>
+    <h1>PROFILE</h1>
+</body>
+</html>

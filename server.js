@@ -37,6 +37,7 @@ app.use(express.json());  // Parse JSON data from requests
 const fs = require('fs');
 const path = require('path');
 const RETAILERS_JSON_PATH = path.join(__dirname, 'retailers.json');
+const CUSTOMERS_JSON_PATH = path.join(__dirname, 'customers.json');
 
 // Setup multer for file uploads
 const upload = multer({ dest: 'uploads/' });
@@ -109,73 +110,83 @@ app.post('/send-message', (req, res) => {
     });
 });
 
-// Signup endpoint
 app.post('/signup', async (req, res) => {
-  const { email, phone, shopKeeperName, shopName, password } = req.body;
-  if (!email || !phone || !shopKeeperName || !shopName || !password) {
+  const { userType, email, phone, shopKeeperName, shopName, password } = req.body;
+
+  if (!userType || !email || !phone || !shopKeeperName || !password || (userType === 'retailer' && !shopName)) {
     return res.status(400).json({ success: false, message: 'Missing required fields' });
   }
 
-  // Read existing retailers
-  fs.readFile(RETAILERS_JSON_PATH, 'utf8', (err, data) => {
+  const jsonPath = userType === 'retailer' ? RETAILERS_JSON_PATH : CUSTOMERS_JSON_PATH;
+
+  // Read existing users
+  fs.readFile(jsonPath, 'utf8', (err, data) => {
     if (err) {
-      console.error('Error reading retailers.json:', err);
-      return res.status(500).json({ success: false, message: 'Internal server error' });
+      if (err.code === 'ENOENT') {
+        // File does not exist, create empty array
+        data = '[]';
+      } else {
+        console.error(`Error reading ${jsonPath}:`, err);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+      }
     }
 
-    let retailers = [];
+    let users = [];
     try {
-      retailers = JSON.parse(data);
+      users = JSON.parse(data);
     } catch (parseErr) {
-      console.error('Error parsing retailers.json:', parseErr);
+      console.error(`Error parsing ${jsonPath}:`, parseErr);
       return res.status(500).json({ success: false, message: 'Internal server error' });
     }
 
     // Check if email already exists
-    if (retailers.some(r => r.email.toLowerCase() === email.toLowerCase())) {
+    if (users.some(u => u.email.toLowerCase() === email.toLowerCase())) {
       return res.status(400).json({ success: false, message: 'Email already registered' });
     }
 
-    // Add new retailer
-    retailers.push({ email, phone, shopKeeperName, shopName, password });
+    // Add new user
+    const newUser = userType === 'retailer'
+      ? { email, phone, shopKeeperName, shopName, password }
+      : { email, phone, shopKeeperName, password };
+
+    users.push(newUser);
 
     // Save back to file
-    fs.writeFile(RETAILERS_JSON_PATH, JSON.stringify(retailers, null, 2), (writeErr) => {
+    fs.writeFile(jsonPath, JSON.stringify(users, null, 2), (writeErr) => {
       if (writeErr) {
-        console.error('Error writing retailers.json:', writeErr);
+        console.error(`Error writing ${jsonPath}:`, writeErr);
         return res.status(500).json({ success: false, message: 'Internal server error' });
       }
-
-      // No longer create or initialize retailer-specific medicine CSV and DB files
 
       res.json({ success: true, message: 'Signup successful' });
     });
   });
 });
 
-// Login endpoint
 app.post('/login', (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password) {
-    return res.status(400).json({ success: false, message: 'Missing email or password' });
+  const { userType, email, password } = req.body;
+  if (!userType || !email || !password) {
+    return res.status(400).json({ success: false, message: 'Missing userType, email or password' });
   }
 
-  fs.readFile(RETAILERS_JSON_PATH, 'utf8', (err, data) => {
+  const jsonPath = userType === 'retailer' ? RETAILERS_JSON_PATH : CUSTOMERS_JSON_PATH;
+
+  fs.readFile(jsonPath, 'utf8', (err, data) => {
     if (err) {
-      console.error('Error reading retailers.json:', err);
+      console.error(`Error reading ${jsonPath}:`, err);
       return res.status(500).json({ success: false, message: 'Internal server error' });
     }
 
-    let retailers = [];
+    let users = [];
     try {
-      retailers = JSON.parse(data);
+      users = JSON.parse(data);
     } catch (parseErr) {
-      console.error('Error parsing retailers.json:', parseErr);
+      console.error(`Error parsing ${jsonPath}:`, parseErr);
       return res.status(500).json({ success: false, message: 'Internal server error' });
     }
 
-    const retailer = retailers.find(r => r.email.toLowerCase() === email.toLowerCase() && r.password === password);
-    if (!retailer) {
+    const user = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === password);
+    if (!user) {
       return res.status(401).json({ success: false, message: 'Invalid email or password' });
     }
 
@@ -183,10 +194,103 @@ app.post('/login', (req, res) => {
   });
 });
 
-// API Endpoint to check medicine expiry (just a demo endpoint)
-app.get('/check-expiry', (req, res) => {
-  // Add your expiry logic here
-  res.json({ success: true, message: 'Expiry check executed' });
+// API Endpoint to check medicine expiry and send reminders to customers with medicines expiring within 30 days
+const csvParser = require('csv-parser');
+const { parse } = require('date-fns');
+
+app.post('/check-expiry', (req, res) => {
+  const { email } = req.body;
+  console.log('Received /check-expiry request for email:', email);
+  if (!email) {
+    console.log('Missing retailer email in request');
+    return res.status(400).json({ success: false, message: 'Missing retailer email' });
+  }
+
+  if (!client.info || !client.info.wid) {
+    console.log('WhatsApp client not ready');
+    return res.status(503).json({ success: false, message: 'WhatsApp client not ready' });
+  }
+
+  const safeEmail = email.replace(/[^a-zA-Z0-9]/g, '_');
+  const retailerCustomerCsvPath = path.join(__dirname, 'retailers', `customers_${safeEmail}.csv`);
+  console.log('Looking for customer CSV at:', retailerCustomerCsvPath);
+
+  if (!fs.existsSync(retailerCustomerCsvPath)) {
+    console.log('Customer CSV not found for retailer:', safeEmail);
+    return res.status(404).json({ success: false, message: 'No customer data found for this retailer' });
+  }
+
+  const customersToNotify = [];
+  const today = new Date();
+  const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000;
+
+  fs.createReadStream(retailerCustomerCsvPath)
+    .pipe(csvParser())
+    .on('data', (row) => {
+      try {
+        const expiryDateStr = row['Expiry Date'];
+        if (!expiryDateStr) return;
+
+        // Parse expiry date, assuming format YYYY-MM-DD or similar
+        const expiryDate = new Date(expiryDateStr);
+        if (isNaN(expiryDate)) return;
+
+        const diff = expiryDate.getTime() - today.getTime();
+        if (diff >= 0 && diff <= THIRTY_DAYS) {
+          customersToNotify.push(row);
+          console.log(`Customer to notify: ${row['Customer Name']} with medicine ${row['Medicine Name']} expiring on ${expiryDateStr}`);
+        }
+      } catch (err) {
+        console.error('Error processing row:', err);
+      }
+    })
+    .on('end', async () => {
+      console.log(`Total customers to notify: ${customersToNotify.length}`);
+      if (customersToNotify.length === 0) {
+        return res.json({ success: true, message: 'No customers with medicines expiring within 30 days' });
+      }
+
+      let sentCount = 0;
+      let failedCount = 0;
+
+      for (const customer of customersToNotify) {
+        const phoneRaw = customer['Phone'];
+        let phone = phoneRaw.replace(/\D/g, ''); // Remove non-digit characters
+        const customerName = customer['Customer Name'];
+        const medicineName = customer['Medicine Name'];
+        const expiryDate = customer['Expiry Date'];
+
+        if (!phone) {
+          console.error(`Invalid phone number for customer ${customerName}: ${phoneRaw}`);
+          failedCount++;
+          continue;
+        }
+
+        // Prepend default country code if phone length is less than 10 digits (adjust as needed)
+        if (phone.length < 10) {
+          phone = '91' + phone; // Assuming India country code as default
+          console.log(`Prepended country code to phone number: ${phone}`);
+        }
+
+        const message = `Dear ${customerName},\n\nThis is a reminder that your purchased medicine "${medicineName}" is expiring on ${expiryDate}. Please consider renewing your stock.\n\nThank you for choosing our service.`;
+
+        try {
+          console.log(`Sending message to ${phone}: ${message}`);
+          await client.sendMessage(`${phone}@c.us`, message);
+          sentCount++;
+        } catch (err) {
+          console.error(`Failed to send message to ${phone}:`, err);
+          failedCount++;
+        }
+      }
+
+      console.log(`Expiry reminders sent. Success: ${sentCount}, Failed: ${failedCount}`);
+      res.json({ success: true, message: `Expiry reminders sent. Success: ${sentCount}, Failed: ${failedCount}` });
+    })
+    .on('error', (err) => {
+      console.error('Error reading customer CSV:', err);
+      res.status(500).json({ success: false, message: 'Failed to read customer data', error: err.message });
+    });
 });
 
 // API Endpoint to get all medicines
@@ -386,8 +490,6 @@ app.get('/retailer-details', (req, res) => {
     res.json({ success: true, data: retailerDetails });
   });
 });
-
-const csvParser = require('csv-parser');
 
 app.get('/sales-data', async (req, res) => {
   const { email } = req.query;
