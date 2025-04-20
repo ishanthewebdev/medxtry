@@ -602,7 +602,7 @@
         if (result.success) {
           const data = result.data;
           if (data.length === 0) {
-            resultsList.innerHTML = '<li>No retailers found with the searched medicine.</li>';
+            resultsList.innerHTML = '<li>No live retailers available with the searched medicine.</li>';
           } else {
             data.forEach(item => {
               const li = document.createElement('li');

@@ -110,7 +110,7 @@
     "shopKeeperName": "new test her",
     "shopName": "ok nko",
     "password": "qwerty1234",
-    "live": true,
+    "live": false,
     "location": "Ganesh Ganj, Mirzapur, Uttar Pradesh, 231209, India"
   }
 ]

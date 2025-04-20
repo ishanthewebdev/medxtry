@@ -519,6 +519,7 @@ Thank you for choosing our service.`;
       e.preventDefault();
 
       const retailerEmail = sessionStorage.getItem('retailerEmail');
+      console.log('Retailer email from sessionStorage:', retailerEmail);
       if (!retailerEmail) {
         alert('Retailer email not found. Please login again.');
         window.location.href = 'login.html';
@@ -527,6 +528,7 @@ Thank you for choosing our service.`;
 
       const location = document.getElementById('retailerLocation').value.trim();
       const live = document.getElementById('retailerLiveStatus').checked;
+      console.log('Updating retailer status with location:', location, 'live:', live);
 
       try {
         const response = await fetch('http://localhost:3000/update-retailer-status', {
@@ -535,6 +537,7 @@ Thank you for choosing our service.`;
           body: JSON.stringify({ email: retailerEmail, location, live })
         });
         const data = await response.json();
+        console.log('Response from update-retailer-status:', data);
         const statusMessage = document.getElementById('statusMessage');
         if (data.success) {
           statusMessage.textContent = 'Status updated successfully.';
