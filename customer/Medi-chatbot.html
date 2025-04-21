@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>HealthBot Assistant</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
@@ -11,6 +11,13 @@
       overflow-y: auto;
       scroll-behavior: smooth;
     }
+    .image-preview {
+      max-width: 100%;
+      max-height: 200px;
+      margin-top: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
   </style>
 </head>
 <body class="bg-gradient-to-br from-sky-100 to-indigo-200 min-h-screen flex items-center justify-center">
@@ -18,22 +25,29 @@
   <div class="w-full max-w-2xl mx-auto p-6 bg-white rounded-3xl shadow-2xl">
     <h1 class="text-3xl font-bold text-center mb-6 text-indigo-700">💬 HealthBot Assistant</h1>
 
-    <div id="chat-window" class="chat-scroll p-4 bg-gray-100 rounded-lg mb-4 space-y-3 h-96">
+    <div id="chat-window" class="chat-scroll p-4 bg-gray-100 rounded-lg mb-4 space-y-3 h-96 flex flex-col">
       <!-- Chat messages will appear here -->
     </div>
 
-    <form id="chat-form" class="flex items-center gap-2">
+    <form id="chat-form" class="flex items-center gap-2 flex-wrap">
       <input id="chat-input" type="text" placeholder="Ask something..."
         class="flex-grow p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+      <input id="image-input" type="file" accept="image/*" class="p-1 border border-gray-300 rounded-lg" />
       <button type="submit"
         class="bg-indigo-600 text-white px-5 py-3 rounded-lg hover:bg-indigo-700 transition">Send</button>
     </form>
+
+    <img id="image-preview" class="image-preview hidden" alt="Image preview" />
+    <div id="image-diagnosis" class="mt-4 p-3 bg-green-100 rounded-lg text-green-800 hidden"></div>
   </div>
 
   <script>
     const form = document.getElementById('chat-form');
     const input = document.getElementById('chat-input');
     const chatWindow = document.getElementById('chat-window');
+    const imageInput = document.getElementById('image-input');
+    const imagePreview = document.getElementById('image-preview');
+    const imageDiagnosis = document.getElementById('image-diagnosis');
 
     function appendMessage(sender, text) {
       const msg = document.createElement('div');
@@ -43,19 +57,64 @@
       chatWindow.scrollTop = chatWindow.scrollHeight;
     }
 
+    imageInput.addEventListener('change', () => {
+      const file = imageInput.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          imagePreview.src = e.target.result;
+          imagePreview.classList.remove('hidden');
+          imageDiagnosis.textContent = '';
+          imageDiagnosis.classList.add('hidden');
+        };
+        reader.readAsDataURL(file);
+      } else {
+        imagePreview.src = '';
+        imagePreview.classList.add('hidden');
+        imageDiagnosis.textContent = '';
+        imageDiagnosis.classList.add('hidden');
+      }
+    });
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const userText = input.value.trim();
-      if (!userText) return;
+      const file = imageInput.files[0];
 
-      appendMessage('user', userText);
+      if (!userText && !file) return;
+
+      if (userText) {
+        appendMessage('user', userText);
+      }
+
       input.value = '';
+      imageInput.value = '';
+      imagePreview.src = '';
+      imagePreview.classList.add('hidden');
 
-      // Simulate bot response (replace with real backend call later)
-      setTimeout(() => {
-        const botResponse = `You asked about: "${userText}". (Real insights coming soon!)`;
-        appendMessage('bot', botResponse);
-      }, 500);
+      // Send chat message or image to backend API
+      const formData = new FormData();
+      if (userText) formData.append('message', userText);
+      if (file) formData.append('image', file);
+
+      try {
+        const response = await fetch('http://localhost:3000/api/chat', {
+          method: 'POST',
+          body: formData
+        });
+        const result = await response.json();
+
+        if (result.reply) {
+          appendMessage('bot', result.reply);
+        }
+
+        if (result.imageDiagnosis) {
+          imageDiagnosis.textContent = result.imageDiagnosis;
+          imageDiagnosis.classList.remove('hidden');
+        }
+      } catch (error) {
+        appendMessage('bot', 'Error: Unable to get response from server.');
+      }
     });
   </script>
 

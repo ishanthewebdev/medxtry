@@ -357,15 +357,15 @@
 
     // Load purchase history from API
     async function loadPurchaseHistory() {
-      const email = sessionStorage.getItem('customerEmail');
-      if (!email) {
-        alert('Customer email not found in session. Please login again.');
+      const phone = sessionStorage.getItem('customerPhone');
+      if (!phone) {
+        alert('Customer phone not found in session. Please login again.');
         window.location.href = '../login.html';
         return;
       }
 
       try {
-        const response = await fetch(`http://localhost:3000/customer-purchases?email=${encodeURIComponent(email)}`);
+        const response = await fetch(`http://localhost:3000/customer-purchases?phone=${encodeURIComponent(phone)}`);
         const result = await response.json();
         if (result.success) {
           populatePurchaseTable(result.data);
@@ -398,25 +398,24 @@
 
         const medicineTd = document.createElement('td');
         medicineTd.className = 'py-2 px-4 text-gray-800 dark:text-gray-200';
-        medicineTd.textContent = purchase['Medicine Name'] || '';
+        medicineTd.textContent = purchase['medicine_name'] || '';
 
         const quantityTd = document.createElement('td');
         quantityTd.className = 'py-2 px-4 text-gray-800 dark:text-gray-200';
-        quantityTd.textContent = purchase['Quantity'] || '';
+        quantityTd.textContent = purchase['quantity'] || '';
 
         const expiryTd = document.createElement('td');
         expiryTd.className = 'py-2 px-4 text-gray-800 dark:text-gray-200';
-        expiryTd.textContent = purchase['Expiry Date'] || '';
+        expiryTd.textContent = purchase['expiry_date'] || '';
 
         const messageTd = document.createElement('td');
         messageTd.className = 'py-2 px-4 text-gray-800 dark:text-gray-200';
-        messageTd.textContent = purchase['Message'] || '';
+        messageTd.textContent = purchase['message'] || '';
 
         tr.appendChild(medicineTd);
         tr.appendChild(quantityTd);
         tr.appendChild(expiryTd);
         tr.appendChild(messageTd);
-
         tbody.appendChild(tr);
       });
     }
@@ -637,11 +636,11 @@
       const cartTotal = document.getElementById('cartTotal');
 
       cartList.innerHTML = '';
+      cartSection.classList.remove('hidden'); // Always show cart section
 
       if (cart.length === 0) {
         cartList.innerHTML = '<li>Your cart is empty.</li>';
         cartTotal.textContent = 'Total: ₹0';
-        cartSection.classList.add('hidden');
         return;
       }
 
@@ -675,7 +674,6 @@
       });
 
       cartTotal.textContent = `Total: ₹${totalPrice.toFixed(2)}`;
-      cartSection.classList.remove('hidden');
 
       // Add event listeners for quantity inputs
       document.querySelectorAll('.cartQtyInput').forEach(input => {

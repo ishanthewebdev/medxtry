@@ -36,6 +36,7 @@ app.use(express.json());  // Parse JSON data from requests
 
 const fs = require('fs');
 const path = require('path');
+const db = require('./db');
 const RETAILERS_JSON_PATH = path.join(__dirname, 'retailers.json');
 const CUSTOMERS_JSON_PATH = path.join(__dirname, 'customers.json');
 
@@ -99,9 +100,9 @@ client.initialize();
 
 // API Endpoint to send a message and update purchase history
 app.post('/send-message', async (req, res) => {
-  const { phone, message, retailerEmail, customerName, medicineName, expiryDate } = req.body;
+  const { phone, message, retailerEmail, customerName, medicineName, expiryDate, quantity } = req.body;
 
-  console.log('Received /send-message request with data:', { phone, message, retailerEmail, customerName, medicineName, expiryDate });
+  console.log('Received /send-message request with data:', { phone, message, retailerEmail, customerName, medicineName, expiryDate, quantity });
 
   if (!phone || !message) {
     console.log('Missing phone or message in request');
@@ -146,12 +147,113 @@ app.post('/send-message', async (req, res) => {
             return custPhoneLast10 === reqPhoneLast10;
           });
 
-          if (customerExists) {
-            console.log('Customer exists in database, updating purchase history');
-            await updatePurchaseHistory();
-          } else {
-            console.log('Customer does not exist in database, skipping purchase history update');
-          }
+    if (customerExists) {
+      console.log('Customer exists in database, updating purchase history');
+      await updatePurchaseHistory();
+
+      // Insert purchase history record into database
+      try {
+        // Find customer id by matching phone number in customers table
+        const getCustomerId = () => {
+          return new Promise((resolve, reject) => {
+            const phoneNormalized = phone.replace(/\D/g, '').slice(-10);
+            db.get(
+              `SELECT id, phone FROM customers`,
+              [],
+              (err, row) => {
+                if (err) {
+                  reject(err);
+                } else {
+                  resolve(row);
+                }
+              }
+            );
+          });
+        };
+
+        const getCustomerIdByPhone = () => {
+          return new Promise((resolve, reject) => {
+            const phoneNormalized = phone.replace(/\D/g, '').slice(-10);
+            db.all(
+              `SELECT id, phone FROM customers`,
+              [],
+              (err, rows) => {
+                if (err) {
+                  reject(err);
+                } else {
+                  const matched = rows.find(r => {
+                    const custPhone = r.phone ? r.phone.replace(/\D/g, '').slice(-10) : '';
+                    return custPhone === phoneNormalized;
+                  });
+                  resolve(matched ? matched.id : null);
+                }
+              }
+            );
+          });
+        };
+
+        // Find retailer id by email
+        const getRetailerIdByEmail = () => {
+          return new Promise((resolve, reject) => {
+            db.get(
+              `SELECT id FROM retailers WHERE email = ?`,
+              [retailerEmail.toLowerCase()],
+              (err, row) => {
+                if (err) {
+                  reject(err);
+                } else {
+                  resolve(row ? row.id : null);
+                }
+              }
+            );
+          });
+        };
+
+        // Get medicine price from retailer's medicine DB
+        const getMedicinePrice = () => {
+          return new Promise(async (resolve, reject) => {
+            try {
+              const safeEmail = retailerEmail.replace(/[^a-zA-Z0-9]/g, '_');
+              const retailerDbPath = path.join(__dirname, 'retailers', `medicines_${safeEmail}.db`);
+              const retailerCsvPath = path.join(__dirname, 'retailers', `medicines_${safeEmail}.csv`);
+              const retailerMedicineDB = new MedicineDB(retailerDbPath, retailerCsvPath);
+              await retailerMedicineDB.open();
+              const medicines = await retailerMedicineDB.getAllMedicines();
+              retailerMedicineDB.close();
+              const medicine = medicines.find(med => med.name.toLowerCase() === medicineName.toLowerCase());
+              resolve(medicine ? medicine.price : null);
+            } catch (err) {
+              resolve(null);
+            }
+          });
+        };
+
+        const customerId = await getCustomerIdByPhone();
+        const retailerId = await getRetailerIdByEmail();
+        const price = await getMedicinePrice();
+
+        if (customerId && retailerId) {
+          console.log(`Inserting purchase history record for customerId=${customerId}, retailerId=${retailerId}, medicineName=${medicineName}, price=${price}, expiryDate=${expiryDate}`);
+          db.run(
+            `INSERT INTO purchase_history (customer_id, retailer_id, medicine_name, quantity, price, expiry_date, message) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+            [customerId, retailerId, medicineName, quantity || 1, price, expiryDate, message],
+            function (err) {
+              if (err) {
+                console.error('Error inserting purchase history:', err);
+              } else {
+                console.log('Purchase history record inserted with id:', this.lastID);
+              }
+            }
+          );
+        } else {
+          console.log('Could not find customer or retailer id for purchase history insertion');
+        }
+      } catch (err) {
+        console.error('Error updating purchase history in database:', err);
+      }
+    } else {
+      console.log('Customer does not exist in database, skipping purchase history update');
+    }
         } catch (err) {
           console.error('Error reading customers.json:', err);
           // Proceed to update purchase history anyway
@@ -243,91 +345,69 @@ app.post('/signup', async (req, res) => {
     return res.status(400).json({ success: false, message: 'Missing required fields' });
   }
 
-  const jsonPath = userType === 'retailer' ? RETAILERS_JSON_PATH : CUSTOMERS_JSON_PATH;
+  const tableName = userType === 'retailer' ? 'retailers' : 'customers';
 
-  // Read existing users
-  fs.readFile(jsonPath, 'utf8', (err, data) => {
-    if (err) {
-      if (err.code === 'ENOENT') {
-        // File does not exist, create empty array
-        data = '[]';
-      } else {
-        console.error(`Error reading ${jsonPath}:`, err);
-        return res.status(500).json({ success: false, message: 'Internal server error' });
-      }
-    }
-
-    let users = [];
-    try {
-      users = JSON.parse(data);
-    } catch (parseErr) {
-      console.error(`Error parsing ${jsonPath}:`, parseErr);
-      return res.status(500).json({ success: false, message: 'Internal server error' });
-    }
-
+  try {
     // Check if email already exists
-    if (users.some(u => u.email.toLowerCase() === email.toLowerCase())) {
-      return res.status(400).json({ success: false, message: 'Email already registered' });
-    }
-
-    // Add new user with live status and location for retailers
-    const newUser = userType === 'retailer'
-      ? { email, phone, shopKeeperName, shopName, password, live: false, location: null }
-      : { email, phone, shopKeeperName, password };
-
-    users.push(newUser);
-
-    // Save back to file
-    fs.writeFile(jsonPath, JSON.stringify(users, null, 2), (writeErr) => {
-      if (writeErr) {
-        console.error(`Error writing ${jsonPath}:`, writeErr);
+    db.get(`SELECT * FROM ${tableName} WHERE email = ?`, [email.toLowerCase()], (err, row) => {
+      if (err) {
+        console.error('Database error:', err);
         return res.status(500).json({ success: false, message: 'Internal server error' });
       }
+      if (row) {
+        return res.status(400).json({ success: false, message: 'Email already registered' });
+      }
 
-      res.json({ success: true, message: 'Signup successful' });
+      // Insert new user
+      if (userType === 'retailer') {
+        const stmt = db.prepare(`INSERT INTO retailers (email, phone, shopKeeperName, shopName, password, live, location) VALUES (?, ?, ?, ?, ?, 0, NULL)`);
+        stmt.run(email.toLowerCase(), phone, shopKeeperName, shopName, password, function(insertErr) {
+          if (insertErr) {
+            console.error('Insert error:', insertErr);
+            return res.status(500).json({ success: false, message: 'Failed to register retailer' });
+          }
+          res.json({ success: true, message: 'Signup successful' });
+        });
+        stmt.finalize();
+      } else {
+        const stmt = db.prepare(`INSERT INTO customers (email, phone, shopKeeperName, password) VALUES (?, ?, ?, ?)`);
+        stmt.run(email.toLowerCase(), phone, shopKeeperName, password, function(insertErr) {
+          if (insertErr) {
+            console.error('Insert error:', insertErr);
+            return res.status(500).json({ success: false, message: 'Failed to register customer' });
+          }
+          res.json({ success: true, message: 'Signup successful' });
+        });
+        stmt.finalize();
+      }
     });
-  });
+  } catch (error) {
+    console.error('Signup error:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
 });
 
-// Endpoint to update retailer location and live status
 app.post('/update-retailer-status', (req, res) => {
   const { email, location, live } = req.body;
   if (!email || typeof live !== 'boolean') {
     return res.status(400).json({ success: false, message: 'Missing email or live status' });
   }
 
-  fs.readFile(RETAILERS_JSON_PATH, 'utf8', (err, data) => {
+  const emailLower = email.trim().toLowerCase();
+
+  const updateQuery = `UPDATE retailers SET live = ?, location = ? WHERE LOWER(email) = ?`;
+
+  db.run(updateQuery, [live ? 1 : 0, location || null, emailLower], function(err) {
     if (err) {
-      console.error('Error reading retailers.json:', err);
-      return res.status(500).json({ success: false, message: 'Internal server error' });
+      console.error('Error updating retailer status in database:', err);
+      return res.status(500).json({ success: false, message: 'Failed to update retailer status' });
     }
 
-    let retailers = [];
-    try {
-      retailers = JSON.parse(data);
-    } catch (parseErr) {
-      console.error('Error parsing retailers.json:', parseErr);
-      return res.status(500).json({ success: false, message: 'Internal server error' });
-    }
-
-    const retailerIndex = retailers.findIndex(r => r.email.toLowerCase() === email.toLowerCase());
-    if (retailerIndex === -1) {
+    if (this.changes === 0) {
       return res.status(404).json({ success: false, message: 'Retailer not found' });
     }
 
-    retailers[retailerIndex].live = live;
-    if (location) {
-      retailers[retailerIndex].location = location;
-    }
-
-    fs.writeFile(RETAILERS_JSON_PATH, JSON.stringify(retailers, null, 2), (writeErr) => {
-      if (writeErr) {
-        console.error('Error writing retailers.json:', writeErr);
-        return res.status(500).json({ success: false, message: 'Failed to update retailer status' });
-      }
-
-      res.json({ success: true, message: 'Retailer status updated successfully' });
-    });
+    res.json({ success: true, message: 'Retailer status updated successfully' });
   });
 });
 
@@ -358,31 +438,26 @@ app.post('/login', (req, res) => {
     return res.status(400).json({ success: false, message: 'Missing userType, email or password' });
   }
 
-  const jsonPath = userType === 'retailer' ? RETAILERS_JSON_PATH : CUSTOMERS_JSON_PATH;
+  const tableName = userType === 'retailer' ? 'retailers' : 'customers';
 
-  fs.readFile(jsonPath, 'utf8', (err, data) => {
-    if (err) {
-      console.error(`Error reading ${jsonPath}:`, err);
-      return res.status(500).json({ success: false, message: 'Internal server error' });
-    }
+  try {
+    db.get(`SELECT * FROM ${tableName} WHERE email = ? AND password = ?`, [email.toLowerCase(), password], (err, row) => {
+      if (err) {
+        console.error('Database error:', err);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+      }
+      if (!row) {
+        return res.status(401).json({ success: false, message: 'Invalid email or password' });
+      }
 
-    let users = [];
-    try {
-      users = JSON.parse(data);
-    } catch (parseErr) {
-      console.error(`Error parsing ${jsonPath}:`, parseErr);
-      return res.status(500).json({ success: false, message: 'Internal server error' });
-    }
-
-    const user = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === password);
-    if (!user) {
-      return res.status(401).json({ success: false, message: 'Invalid email or password' });
-    }
-
-    // Return user details along with success message
-    const { password: _, ...userWithoutPassword } = user;
-    res.json({ success: true, message: 'Login successful', user: userWithoutPassword });
-  });
+      // Remove password from response
+      const { password, ...userWithoutPassword } = row;
+      res.json({ success: true, message: 'Login successful', user: userWithoutPassword });
+    });
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
 });
 
 // API Endpoint to check medicine expiry and send reminders to customers with medicines expiring within 30 days
@@ -654,30 +729,17 @@ app.get('/retailer-details', (req, res) => {
   }
   email = email.trim().toLowerCase();
 
-  fs.readFile(RETAILERS_JSON_PATH, 'utf8', (err, data) => {
+  db.get('SELECT * FROM retailers WHERE email = ?', [email], (err, row) => {
     if (err) {
-      console.error('Error reading retailers.json:', err);
+      console.error('Database error:', err);
       return res.status(500).json({ success: false, message: 'Internal server error' });
     }
-
-    let retailers = [];
-    try {
-      retailers = JSON.parse(data);
-      console.log('Retailers loaded:', retailers.map(r => r.email));
-    } catch (parseErr) {
-      console.error('Error parsing retailers.json:', parseErr);
-      return res.status(500).json({ success: false, message: 'Internal server error' });
-    }
-
-    const retailer = retailers.find(r => r.email.toLowerCase() === email);
-    if (!retailer) {
+    if (!row) {
       console.log('Retailer not found for email:', email);
       return res.status(404).json({ success: false, message: 'Retailer not found' });
     }
-
-    console.log('Found retailer:', retailer);
     // Return retailer details except password
-    const { password, ...retailerDetails } = retailer;
+    const { password, ...retailerDetails } = row;
     res.json({ success: true, data: retailerDetails });
   });
 });
@@ -763,50 +825,30 @@ app.get('/sales-data', async (req, res) => {
 });
 
 app.get('/customer-purchases', (req, res) => {
-  const { email, phone } = req.query;
-  if (!email && !phone) {
-    return res.status(400).json({ success: false, message: 'Missing email or phone parameter' });
+  console.log('Received /customer-purchases request with query:', req.query);
+  const { phone } = req.query;
+  if (!phone) {
+    console.log('Missing phone parameter in /customer-purchases request');
+    return res.status(400).json({ success: false, message: 'Missing phone parameter' });
   }
 
-  const customersDir = path.join(__dirname, 'retailers');
-  const purchaseRecords = [];
+  const phoneNormalized = phone.replace(/\D/g, '').slice(-10);
 
-  fs.readdir(customersDir, (err, files) => {
+  const query = `
+    SELECT ph.id, c.phone as customerPhone, r.email as retailerEmail, ph.medicine_name, ph.quantity, ph.price, ph.expiry_date, ph.message, ph.purchase_date
+    FROM purchase_history ph
+    JOIN customers c ON ph.customer_id = c.id
+    JOIN retailers r ON ph.retailer_id = r.id
+    WHERE SUBSTR(c.phone, -10) = ?
+    ORDER BY ph.purchase_date DESC
+  `;
+
+  db.all(query, [phoneNormalized], (err, rows) => {
     if (err) {
-      console.error('Error reading retailers directory:', err);
-      return res.status(500).json({ success: false, message: 'Internal server error' });
+      console.error('Error querying purchase history:', err);
+      return res.status(500).json({ success: false, message: 'Failed to query purchase history', error: err.message });
     }
-
-    const customerFiles = files.filter(f => f.startsWith('customers_') && f.endsWith('.csv'));
-    if (customerFiles.length === 0) {
-      return res.json({ success: true, data: [] });
-    }
-
-    let filesProcessed = 0;
-
-    customerFiles.forEach(file => {
-      const filePath = path.join(customersDir, file);
-      fs.createReadStream(filePath)
-        .pipe(csvParser())
-        .on('data', (row) => {
-          const customerEmail = row['Email'] || '';
-          const customerPhone = row['Phone'] || '';
-          if ((email && customerEmail.toLowerCase() === email.toLowerCase()) ||
-              (phone && customerPhone === phone)) {
-            purchaseRecords.push(row);
-          }
-        })
-        .on('end', () => {
-          filesProcessed++;
-          if (filesProcessed === customerFiles.length) {
-            res.json({ success: true, data: purchaseRecords });
-          }
-        })
-        .on('error', (error) => {
-          console.error('Error reading customer purchase CSV:', error);
-          res.status(500).json({ success: false, message: 'Failed to read purchase data', error: error.message });
-        });
-    });
+    res.json({ success: true, data: rows });
   });
 });
 
@@ -867,25 +909,15 @@ app.post('/search-medicine', async (req, res) => {
     return res.status(400).json({ success: false, message: 'Missing medicineName in request body' });
   }
 
-  fs.readFile(RETAILERS_JSON_PATH, 'utf8', async (err, data) => {
+  const sqlite3 = require('sqlite3').verbose();
+  const results = [];
+
+  // Query database for active retailers (live = 1)
+  db.all('SELECT * FROM retailers WHERE live = 1', async (err, retailers) => {
     if (err) {
-      console.error('Error reading retailers.json:', err);
+      console.error('Error querying active retailers:', err);
       return res.status(500).json({ success: false, message: 'Internal server error' });
     }
-
-    let retailers = [];
-    try {
-      retailers = JSON.parse(data);
-    } catch (parseErr) {
-      console.error('Error parsing retailers.json:', parseErr);
-      return res.status(500).json({ success: false, message: 'Internal server error' });
-    }
-
-    // Filter live retailers
-    const liveRetailers = retailers.filter(r => r.live === true);
-
-    const sqlite3 = require('sqlite3').verbose();
-    const results = [];
 
     // Helper function to query medicine DB for a retailer
     const queryRetailerMedicines = (retailer) => {
@@ -934,10 +966,67 @@ app.post('/search-medicine', async (req, res) => {
       });
     };
 
-    // Query all live retailers in parallel
-    await Promise.all(liveRetailers.map(r => queryRetailerMedicines(r)));
+    // Query all active retailers in parallel
+    await Promise.all(retailers.map(r => queryRetailerMedicines(r)));
 
     res.json({ success: true, data: results });
+  });
+});
+
+app.get('/check-retailer', (req, res) => {
+  const { email } = req.query;
+  if (!email) {
+    return res.status(400).json({ success: false, message: 'Missing email parameter' });
+  }
+  db.get('SELECT * FROM retailers WHERE email = ?', [email.toLowerCase()], (err, row) => {
+    if (err) {
+      console.error('Database error:', err);
+      return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+    if (!row) {
+      return res.status(404).json({ success: false, message: 'Retailer not found' });
+    }
+    const { password, ...retailerWithoutPassword } = row;
+    res.json({ success: true, retailer: retailerWithoutPassword });
+  });
+});
+
+app.get('/purchase-history', (req, res) => {
+  const { customerPhone, retailerEmail } = req.query;
+
+  let query = `
+    SELECT ph.id, c.phone as customerPhone, r.email as retailerEmail, ph.medicine_name, ph.price, ph.expiry_date, ph.message, ph.purchase_date
+    FROM purchase_history ph
+    JOIN customers c ON ph.customer_id = c.id
+    JOIN retailers r ON ph.retailer_id = r.id
+  `;
+
+  const conditions = [];
+  const params = [];
+
+  if (customerPhone) {
+    const phoneNormalized = customerPhone.replace(/\D/g, '').slice(-10);
+    conditions.push(`SUBSTR(c.phone, -10) = ?`);
+    params.push(phoneNormalized);
+  }
+
+  if (retailerEmail) {
+    conditions.push(`r.email = ?`);
+    params.push(retailerEmail.toLowerCase());
+  }
+
+  if (conditions.length > 0) {
+    query += ' WHERE ' + conditions.join(' AND ');
+  }
+
+  query += ' ORDER BY ph.purchase_date DESC';
+
+  db.all(query, params, (err, rows) => {
+    if (err) {
+      console.error('Error querying purchase history:', err);
+      return res.status(500).json({ success: false, message: 'Failed to query purchase history', error: err.message });
+    }
+    res.json({ success: true, data: rows });
   });
 });
 
