@@ -464,17 +464,10 @@ app.post('/login', (req, res) => {
 const csvParser = require('csv-parser');
 const { parse } = require('date-fns');
 
-app.post('/check-expiry', (req, res) => {
-  const { email } = req.body;
-  console.log('Received /check-expiry request for email:', email);
-  if (!email) {
-    console.log('Missing retailer email in request');
-    return res.status(400).json({ success: false, message: 'Missing retailer email' });
-  }
-
+async function sendExpiryRemindersForRetailer(email) {
   if (!client.info || !client.info.wid) {
     console.log('WhatsApp client not ready');
-    return res.status(503).json({ success: false, message: 'WhatsApp client not ready' });
+    throw new Error('WhatsApp client not ready');
   }
 
   const safeEmail = email.replace(/[^a-zA-Z0-9]/g, '_');
@@ -483,80 +476,142 @@ app.post('/check-expiry', (req, res) => {
 
   if (!fs.existsSync(retailerCustomerCsvPath)) {
     console.log('Customer CSV not found for retailer:', safeEmail);
-    return res.status(404).json({ success: false, message: 'No customer data found for this retailer' });
+    throw new Error('No customer data found for this retailer');
   }
+
+  // Get shop name from retailers DB
+  const getShopName = () => {
+    return new Promise((resolve, reject) => {
+      db.get('SELECT shopName FROM retailers WHERE email = ?', [email.toLowerCase()], (err, row) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(row ? row.shopName : '');
+        }
+      });
+    });
+  };
+
+  const shopName = await getShopName();
 
   const customersToNotify = [];
   const today = new Date();
   const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000;
 
-  fs.createReadStream(retailerCustomerCsvPath)
-    .pipe(csvParser())
-    .on('data', (row) => {
-      try {
-        const expiryDateStr = row['Expiry Date'];
-        if (!expiryDateStr) return;
-
-        // Parse expiry date, assuming format YYYY-MM-DD or similar
-        const expiryDate = new Date(expiryDateStr);
-        if (isNaN(expiryDate)) return;
-
-        const diff = expiryDate.getTime() - today.getTime();
-        if (diff >= 0 && diff <= THIRTY_DAYS) {
-          customersToNotify.push(row);
-          console.log(`Customer to notify: ${row['Customer Name']} with medicine ${row['Medicine Name']} expiring on ${expiryDateStr}`);
-        }
-      } catch (err) {
-        console.error('Error processing row:', err);
-      }
-    })
-    .on('end', async () => {
-      console.log(`Total customers to notify: ${customersToNotify.length}`);
-      if (customersToNotify.length === 0) {
-        return res.json({ success: true, message: 'No customers with medicines expiring within 30 days' });
-      }
-
-      let sentCount = 0;
-      let failedCount = 0;
-
-      for (const customer of customersToNotify) {
-        const phoneRaw = customer['Phone'];
-        let phone = phoneRaw.replace(/\D/g, ''); // Remove non-digit characters
-        const customerName = customer['Customer Name'];
-        const medicineName = customer['Medicine Name'];
-        const expiryDate = customer['Expiry Date'];
-
-        if (!phone) {
-          console.error(`Invalid phone number for customer ${customerName}: ${phoneRaw}`);
-          failedCount++;
-          continue;
-        }
-
-        // Prepend default country code if phone length is less than 10 digits (adjust as needed)
-        if (phone.length < 10) {
-          phone = '91' + phone; // Assuming India country code as default
-          console.log(`Prepended country code to phone number: ${phone}`);
-        }
-
-        const message = `Dear ${customerName},\n\nThis is a reminder that your purchased medicine "${medicineName}" is expiring on ${expiryDate}. Please consider renewing your stock.\n\nThank you for choosing our service.`;
-
+  return new Promise((resolve, reject) => {
+    fs.createReadStream(retailerCustomerCsvPath)
+      .pipe(csvParser())
+      .on('data', (row) => {
         try {
-          console.log(`Sending message to ${phone}: ${message}`);
-          await client.sendMessage(`${phone}@c.us`, message);
-          sentCount++;
-        } catch (err) {
-          console.error(`Failed to send message to ${phone}:`, err);
-          failedCount++;
-        }
-      }
+          const expiryDateStr = row['Expiry Date'];
+          if (!expiryDateStr) return;
 
-      console.log(`Expiry reminders sent. Success: ${sentCount}, Failed: ${failedCount}`);
-      res.json({ success: true, message: `Expiry reminders sent. Success: ${sentCount}, Failed: ${failedCount}` });
-    })
-    .on('error', (err) => {
-      console.error('Error reading customer CSV:', err);
-      res.status(500).json({ success: false, message: 'Failed to read customer data', error: err.message });
-    });
+          // Parse expiry date, assuming format YYYY-MM-DD or similar
+          const expiryDate = new Date(expiryDateStr);
+          if (isNaN(expiryDate)) return;
+
+          const diff = expiryDate.getTime() - today.getTime();
+          if (diff >= 0 && diff <= THIRTY_DAYS) {
+            customersToNotify.push(row);
+            console.log(`Customer to notify: ${row['Customer Name']} with medicine ${row['Medicine Name']} expiring on ${expiryDateStr}`);
+          }
+        } catch (err) {
+          console.error('Error processing row:', err);
+        }
+      })
+      .on('end', async () => {
+        console.log(`Total customers to notify: ${customersToNotify.length}`);
+        if (customersToNotify.length === 0) {
+          resolve({ success: true, message: 'No customers with medicines expiring within 30 days' });
+          return;
+        }
+
+        let sentCount = 0;
+        let failedCount = 0;
+
+        for (const customer of customersToNotify) {
+          const phoneRaw = customer['Phone'];
+          let phone = phoneRaw.replace(/\D/g, ''); // Remove non-digit characters
+          const customerName = customer['Customer Name'];
+          const medicineName = customer['Medicine Name'];
+          const expiryDate = customer['Expiry Date'];
+
+          if (!phone) {
+            console.error(`Invalid phone number for customer ${customerName}: ${phoneRaw}`);
+            failedCount++;
+            continue;
+          }
+
+          // Prepend default country code if phone length is less than 10 digits (adjust as needed)
+          if (phone.length < 10) {
+            phone = '91' + phone; // Assuming India country code as default
+            console.log(`Prepended country code to phone number: ${phone}`);
+          }
+
+          const message = `Dear ${customerName},\n\nThis is a reminder from ${shopName} that your purchased medicine "${medicineName}" is expiring on ${expiryDate}. Please consider renewing your stock.\n\nThank you for choosing our service.`;
+
+          try {
+            console.log(`Sending message to ${phone}: ${message}`);
+            await client.sendMessage(`${phone}@c.us`, message);
+            sentCount++;
+          } catch (err) {
+            console.error(`Failed to send message to ${phone}:`, err);
+            failedCount++;
+          }
+        }
+
+        console.log(`Expiry reminders sent. Success: ${sentCount}, Failed: ${failedCount}`);
+        resolve({ success: true, message: `Expiry reminders sent. Success: ${sentCount}, Failed: ${failedCount}` });
+      })
+      .on('error', (err) => {
+        console.error('Error reading customer CSV:', err);
+        reject(err);
+      });
+  });
+}
+
+app.post('/check-expiry', async (req, res) => {
+  const { email } = req.body;
+  console.log('Received /check-expiry request for email:', email);
+  if (!email) {
+    return res.status(400).json({ success: false, message: 'Missing retailer email' });
+  }
+
+  try {
+    const result = await sendExpiryRemindersForRetailer(email);
+    res.json(result);
+  } catch (err) {
+    console.error('Error sending expiry reminders:', err);
+    res.status(500).json({ success: false, message: 'Failed to send expiry reminders', error: err.message });
+  }
+});
+
+// Schedule daily job to send expiry reminders for all live retailers
+const cron = require('node-cron');
+
+async function sendExpiryRemindersForAllRetailers() {
+  try {
+    const data = await fs.promises.readFile(RETAILERS_JSON_PATH, 'utf8');
+    const retailers = JSON.parse(data);
+    const liveRetailers = retailers.filter(r => r.live === true);
+
+    for (const retailer of liveRetailers) {
+      try {
+        console.log(`Sending expiry reminders for retailer: ${retailer.email}`);
+        await sendExpiryRemindersForRetailer(retailer.email);
+      } catch (err) {
+        console.error(`Failed to send expiry reminders for retailer ${retailer.email}:`, err);
+      }
+    }
+  } catch (err) {
+    console.error('Error reading retailers.json for expiry reminders:', err);
+  }
+}
+
+// Schedule the job to run daily at 8 AM server time
+cron.schedule('0 8 * * *', () => {
+  console.log('Running scheduled job: sendExpiryRemindersForAllRetailers');
+  sendExpiryRemindersForAllRetailers();
 });
 
 // API Endpoint to get all medicines
