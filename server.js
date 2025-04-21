@@ -652,6 +652,54 @@ app.get('/medicines', async (req, res) => {
   }
 });
 
+// New API endpoint to get medicines expiring within 4 months for a retailer
+app.get('/medicines-expiring-soon', async (req, res) => {
+  const { email } = req.query;
+  if (!email) {
+    return res.status(400).json({ success: false, message: 'Missing retailer email' });
+  }
+  const safeEmail = email.replace(/[^a-zA-Z0-9]/g, '_');
+  const retailerDbPath = path.join(__dirname, 'retailers', `medicines_${safeEmail}.db`);
+  const retailerCsvPath = path.join(__dirname, 'retailers', `medicines_${safeEmail}.csv`);
+
+  // Ensure medicine CSV file exists, if not copy from original
+  const originalCsvPath = path.join(__dirname, 'medicines.csv');
+  if (!fs.existsSync(retailerCsvPath)) {
+    try {
+      fs.copyFileSync(originalCsvPath, retailerCsvPath);
+    } catch (copyErr) {
+      console.error('Error copying medicine CSV for retailer:', copyErr);
+      return res.status(500).json({ success: false, message: 'Failed to prepare medicine CSV file', error: copyErr.message });
+    }
+  }
+
+  const retailerMedicineDB = new MedicineDB(retailerDbPath, retailerCsvPath);
+  try {
+    // Check if DB file exists, if not initialize it
+    if (!fs.existsSync(retailerDbPath)) {
+      await retailerMedicineDB.initialize();
+      await retailerMedicineDB.importFromCSV();
+    }
+    const allMedicines = await retailerMedicineDB.getAllMedicines();
+    const today = new Date();
+    const fourMonthsLater = new Date(today);
+    fourMonthsLater.setMonth(fourMonthsLater.getMonth() + 4);
+
+    // Filter medicines expiring within 4 months
+    const expiringSoonMedicines = allMedicines.filter(med => {
+      if (!med.expiry_date) return false;
+      const expiryDate = new Date(med.expiry_date);
+      return expiryDate >= today && expiryDate <= fourMonthsLater;
+    });
+
+    retailerMedicineDB.close();
+    res.json({ success: true, data: expiringSoonMedicines });
+  } catch (err) {
+    console.error('Error fetching expiring soon medicines:', err.stack || err);
+    res.status(500).json({ success: false, message: 'Failed to fetch expiring soon medicines', error: err.message });
+  }
+});
+
 // API Endpoint to refresh medicines database from CSV
 app.post('/refresh-medicines', async (req, res) => {
   try {

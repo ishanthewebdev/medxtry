@@ -312,12 +312,13 @@
 <body>
   <nav>
     <div class="brand">MEDX</div>
-    <ul>
-      <li id="navProfile">Profile</li>
-      <li id="navSales">Sales</li>
-      <li id="navUploadCsv">Upload CSV</li>
-      <li id="navLogout">Logout</li>
-    </ul>
+      <ul>
+        <li id="navProfile">Profile</li>
+        <li id="navSales">Sales</li>
+        <li id="navExpireSoon">Expire Soon</li>
+        <li id="navUploadCsv">Upload CSV</li>
+        <li id="navLogout">Logout</li>
+      </ul>
   </nav>
 
   <div class="main-wrapper" role="main" aria-label="Retailer dashboard">
@@ -359,6 +360,24 @@
           <input type="text" id="message" placeholder="Enter your message" required aria-required="true" />
           <button type="submit" style="margin-top: 10px; width: 100%;">Send Message</button>
         </form>
+      </section>
+
+      <section id="expireSoonSection" aria-labelledby="expireSoonHeading" style="display:none; margin-top: 30px;">
+        <h2 id="expireSoonHeading">Medicines Expiring Within 4 Months</h2>
+        <table id="expireSoonTable" style="width: 100%; border-collapse: collapse; color: #f0f4f8;">
+          <thead>
+            <tr>
+              <th style="border-bottom: 1px solid #7f9cf5; padding: 8px; text-align: left;">Medicine Name</th>
+              <th style="border-bottom: 1px solid #7f9cf5; padding: 8px; text-align: right;">Quantity</th>
+              <th style="border-bottom: 1px solid #7f9cf5; padding: 8px; text-align: left;">Expiry Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Expiring medicines rows will be inserted here -->
+          </tbody>
+        </table>
+        <div id="expireSoonLoading" style="margin-top: 10px;">Loading...</div>
+        <div id="expireSoonError" style="margin-top: 10px; color: #ff6b6b; display: none;"></div>
       </section>
     </div>
 
@@ -884,6 +903,70 @@ Thank you for choosing our service.`;
       await loadRetailerDetails();
       await loadMedicines();
     };
+
+    // Handle Expire Soon tab click
+    document.getElementById('navExpireSoon').addEventListener('click', async () => {
+      // Hide other sections
+      document.getElementById('sendReminderHeading').parentElement.style.display = 'none';
+      document.getElementById('expireSoonSection').style.display = 'block';
+
+      const expireSoonTableBody = document.querySelector('#expireSoonTable tbody');
+      const expireSoonLoading = document.getElementById('expireSoonLoading');
+      const expireSoonError = document.getElementById('expireSoonError');
+
+      expireSoonTableBody.innerHTML = '';
+      expireSoonError.style.display = 'none';
+      expireSoonLoading.style.display = 'block';
+
+      const retailerEmail = sessionStorage.getItem('retailerEmail');
+      if (!retailerEmail) {
+        expireSoonLoading.style.display = 'none';
+        expireSoonError.textContent = 'Retailer email not found. Please login again.';
+        expireSoonError.style.display = 'block';
+        return;
+      }
+
+      try {
+        const response = await fetch(`http://localhost:3000/medicines-expiring-soon?email=${encodeURIComponent(retailerEmail)}`);
+        const data = await response.json();
+        expireSoonLoading.style.display = 'none';
+
+        if (!data.success) {
+          expireSoonError.textContent = data.message || 'Failed to load expiring medicines.';
+          expireSoonError.style.display = 'block';
+          return;
+        }
+
+        if (data.data.length === 0) {
+          expireSoonError.textContent = 'No medicines expiring within 4 months.';
+          expireSoonError.style.display = 'block';
+          return;
+        }
+
+        data.data.forEach(med => {
+          const row = document.createElement('tr');
+          const nameCell = document.createElement('td');
+          nameCell.textContent = med.name;
+          nameCell.style.padding = '8px';
+          const quantityCell = document.createElement('td');
+          quantityCell.textContent = med.quantity;
+          quantityCell.style.padding = '8px';
+          quantityCell.style.textAlign = 'right';
+          const expiryCell = document.createElement('td');
+          expiryCell.textContent = med.expiry_date;
+          expiryCell.style.padding = '8px';
+          row.appendChild(nameCell);
+          row.appendChild(quantityCell);
+          row.appendChild(expiryCell);
+          expireSoonTableBody.appendChild(row);
+        });
+      } catch (err) {
+        expireSoonLoading.style.display = 'none';
+        expireSoonError.textContent = 'Error loading expiring medicines.';
+        expireSoonError.style.display = 'block';
+        console.error('Error fetching expiring medicines:', err);
+      }
+    });
   </script>
 </body>
 </html>
