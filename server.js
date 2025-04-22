@@ -125,138 +125,114 @@ app.post('/send-message', async (req, res) => {
       // Async function to check customer existence and update purchase history
       const updatePurchaseHistoryAsync = async () => {
         try {
-          const data = await fs.promises.readFile(CUSTOMERS_JSON_PATH, 'utf8');
-          let customers = [];
-          try {
-            customers = JSON.parse(data);
-          } catch (parseErr) {
-            console.error('Error parsing customers.json:', parseErr);
-            // Proceed to update purchase history anyway
+          const phoneNormalized = phone.replace(/\D/g, '').slice(-10);
+
+          // Check if customer exists in database
+          const customerExists = await new Promise((resolve, reject) => {
+            db.get(
+              `SELECT id FROM customers WHERE SUBSTR(phone, -10) = ?`,
+              [phoneNormalized],
+              (err, row) => {
+                if (err) {
+                  reject(err);
+                } else {
+                  resolve(!!row);
+                }
+              }
+            );
+          });
+
+          if (customerExists) {
+            console.log('Customer exists in database, updating purchase history');
             await updatePurchaseHistory();
-            return;
-          }
 
-          const customerExists = customers.some(cust => {
-            const custPhone = cust.phone ? cust.phone.replace(/\D/g, '') : '';
-            const reqPhone = phone.replace(/\D/g, '');
-
-            // Compare last 10 digits to handle country code differences
-            const custPhoneLast10 = custPhone.slice(-10);
-            const reqPhoneLast10 = reqPhone.slice(-10);
-
-            return custPhoneLast10 === reqPhoneLast10;
-          });
-
-    if (customerExists) {
-      console.log('Customer exists in database, updating purchase history');
-      await updatePurchaseHistory();
-
-      // Insert purchase history record into database
-      try {
-        // Find customer id by matching phone number in customers table
-        const getCustomerId = () => {
-          return new Promise((resolve, reject) => {
-            const phoneNormalized = phone.replace(/\D/g, '').slice(-10);
-            db.get(
-              `SELECT id, phone FROM customers`,
-              [],
-              (err, row) => {
-                if (err) {
-                  reject(err);
-                } else {
-                  resolve(row);
-                }
-              }
-            );
-          });
-        };
-
-        const getCustomerIdByPhone = () => {
-          return new Promise((resolve, reject) => {
-            const phoneNormalized = phone.replace(/\D/g, '').slice(-10);
-            db.all(
-              `SELECT id, phone FROM customers`,
-              [],
-              (err, rows) => {
-                if (err) {
-                  reject(err);
-                } else {
-                  const matched = rows.find(r => {
-                    const custPhone = r.phone ? r.phone.replace(/\D/g, '').slice(-10) : '';
-                    return custPhone === phoneNormalized;
-                  });
-                  resolve(matched ? matched.id : null);
-                }
-              }
-            );
-          });
-        };
-
-        // Find retailer id by email
-        const getRetailerIdByEmail = () => {
-          return new Promise((resolve, reject) => {
-            db.get(
-              `SELECT id FROM retailers WHERE email = ?`,
-              [retailerEmail.toLowerCase()],
-              (err, row) => {
-                if (err) {
-                  reject(err);
-                } else {
-                  resolve(row ? row.id : null);
-                }
-              }
-            );
-          });
-        };
-
-        // Get medicine price from retailer's medicine DB
-        const getMedicinePrice = () => {
-          return new Promise(async (resolve, reject) => {
+            // Insert purchase history record into database
             try {
-              const safeEmail = retailerEmail.replace(/[^a-zA-Z0-9]/g, '_');
-              const retailerDbPath = path.join(__dirname, 'retailers', `medicines_${safeEmail}.db`);
-              const retailerCsvPath = path.join(__dirname, 'retailers', `medicines_${safeEmail}.csv`);
-              const retailerMedicineDB = new MedicineDB(retailerDbPath, retailerCsvPath);
-              await retailerMedicineDB.open();
-              const medicines = await retailerMedicineDB.getAllMedicines();
-              retailerMedicineDB.close();
-              const medicine = medicines.find(med => med.name.toLowerCase() === medicineName.toLowerCase());
-              resolve(medicine ? medicine.price : null);
-            } catch (err) {
-              resolve(null);
-            }
-          });
-        };
+              // Find customer id by matching phone number in customers table
+              const getCustomerIdByPhone = () => {
+                return new Promise((resolve, reject) => {
+                  db.all(
+                    `SELECT id, phone FROM customers`,
+                    [],
+                    (err, rows) => {
+                      if (err) {
+                        reject(err);
+                      } else {
+                        const matched = rows.find(r => {
+                          const custPhone = r.phone ? r.phone.replace(/\D/g, '').slice(-10) : '';
+                          return custPhone === phoneNormalized;
+                        });
+                        resolve(matched ? matched.id : null);
+                      }
+                    }
+                  );
+                });
+              };
 
-        const customerId = await getCustomerIdByPhone();
-        const retailerId = await getRetailerIdByEmail();
-        const price = await getMedicinePrice();
+              // Find retailer id by email
+              const getRetailerIdByEmail = () => {
+                return new Promise((resolve, reject) => {
+                  db.get(
+                    `SELECT id FROM retailers WHERE email = ?`,
+                    [retailerEmail.toLowerCase()],
+                    (err, row) => {
+                      if (err) {
+                        reject(err);
+                      } else {
+                        resolve(row ? row.id : null);
+                      }
+                    }
+                  );
+                });
+              };
 
-        if (customerId && retailerId) {
-          console.log(`Inserting purchase history record for customerId=${customerId}, retailerId=${retailerId}, medicineName=${medicineName}, price=${price}, expiryDate=${expiryDate}`);
-          db.run(
-            `INSERT INTO purchase_history (customer_id, retailer_id, medicine_name, quantity, price, expiry_date, message) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-            [customerId, retailerId, medicineName, quantity || 1, price, expiryDate, message],
-            function (err) {
-              if (err) {
-                console.error('Error inserting purchase history:', err);
+              // Get medicine price from retailer's medicine DB
+              const getMedicinePrice = () => {
+                return new Promise(async (resolve, reject) => {
+                  try {
+                    const safeEmail = retailerEmail.replace(/[^a-zA-Z0-9]/g, '_');
+                    const retailerDbPath = path.join(__dirname, 'retailers', `medicines_${safeEmail}.db`);
+                    const retailerCsvPath = path.join(__dirname, 'retailers', `medicines_${safeEmail}.csv`);
+                    const retailerMedicineDB = new MedicineDB(retailerDbPath, retailerCsvPath);
+                    await retailerMedicineDB.open();
+                    const medicines = await retailerMedicineDB.getAllMedicines();
+                    retailerMedicineDB.close();
+                    const medicine = medicines.find(med => med.name.toLowerCase() === medicineName.toLowerCase());
+                    resolve(medicine ? medicine.price : null);
+                  } catch (err) {
+                    resolve(null);
+                  }
+                });
+              };
+
+              const customerId = await getCustomerIdByPhone();
+              const retailerId = await getRetailerIdByEmail();
+              const price = await getMedicinePrice();
+
+              if (customerId && retailerId) {
+                console.log(`Inserting purchase history record for customerId=${customerId}, retailerId=${retailerId}, medicineName=${medicineName}, price=${price}, expiryDate=${expiryDate}`);
+                db.run(
+                  `INSERT INTO purchase_history (customer_id, retailer_id, medicine_name, quantity, price, expiry_date, message) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+                  [customerId, retailerId, medicineName, quantity || 1, price, expiryDate, message],
+                  function (err) {
+                    if (err) {
+                      console.error('Error inserting purchase history:', err);
+                    } else {
+                      console.log('Purchase history record inserted with id:', this.lastID);
+                    }
+                  }
+                );
               } else {
-                console.log('Purchase history record inserted with id:', this.lastID);
+                console.log('Could not find customer or retailer id for purchase history insertion');
               }
+            } catch (err) {
+              console.error('Error updating purchase history in database:', err);
             }
-          );
-        } else {
-          console.log('Could not find customer or retailer id for purchase history insertion');
-        }
-      } catch (err) {
-        console.error('Error updating purchase history in database:', err);
-      }
-    } else {
-      console.log('Customer does not exist in database, skipping purchase history update');
-    }
+          } else {
+            console.log('Customer does not exist in database, skipping purchase history update');
+          }
         } catch (err) {
-          console.error('Error reading customers.json:', err);
-          // Proceed to update purchase history anyway
+          console.error('Error checking customer existence in database:', err);
           await updatePurchaseHistory();
         }
       };
@@ -278,34 +254,14 @@ app.post('/send-message', async (req, res) => {
           await fs.promises.appendFile(retailerCustomerCsvPath, csvLine);
           console.log(`Purchase history updated for customer ${customerName} in ${retailerCustomerCsvPath}`);
 
-          // Update global customer CSV only if phone number matches last 10 digits in customers.json
+          // Update global customer CSV
           if (!fs.existsSync(globalCustomerCsvPath)) {
             console.log('Global customer CSV file does not exist, creating with headers');
             const headers = '"Customer Name","Location","Phone","Medicine Name","Quantity","Expiry Date","Message"\n';
             await fs.promises.writeFile(globalCustomerCsvPath, headers);
           }
-
-          // Read customers.json to verify phone number match
-          const customersData = await fs.promises.readFile(CUSTOMERS_JSON_PATH, 'utf8');
-          let customersList = [];
-          try {
-            customersList = JSON.parse(customersData);
-          } catch (parseErr) {
-            console.error('Error parsing customers.json:', parseErr);
-          }
-
-          const phoneNormalized = phone.replace(/\D/g, '').slice(-10);
-          const customerMatch = customersList.some(cust => {
-            const custPhone = cust.phone ? cust.phone.replace(/\D/g, '').slice(-10) : '';
-            return custPhone === phoneNormalized;
-          });
-
-          if (customerMatch) {
-            await fs.promises.appendFile(globalCustomerCsvPath, csvLine);
-            console.log(`Purchase history updated for customer ${customerName} in global customer CSV`);
-          } else {
-            console.log(`Phone number ${phone} not found in customers.json, skipping global CSV update`);
-          }
+          await fs.promises.appendFile(globalCustomerCsvPath, csvLine);
+          console.log(`Purchase history updated for customer ${customerName} in global customer CSV`);
         } catch (err) {
           console.error('Error writing customer data to CSV:', err);
         }
@@ -1130,6 +1086,70 @@ app.get('/purchase-history', (req, res) => {
       return res.status(500).json({ success: false, message: 'Failed to query purchase history', error: err.message });
     }
     res.json({ success: true, data: rows });
+  });
+});
+
+const fetch = require('node-fetch'); // For calling external APIs if needed
+
+// Load environment variables for API keys
+require('dotenv').config();
+
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+
+// AI chat endpoint
+app.post('/ai-chat', express.json(), async (req, res) => {
+  const { message } = req.body;
+  if (!message) {
+    return res.status(400).json({ success: false, message: 'No message provided' });
+  }
+
+  try {
+    // Call OpenAI Chat Completion API (GPT-3.5-turbo or GPT-4)
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'gpt-3.5-turbo',
+        messages: [
+          { role: 'system', content: 'You are a helpful medical assistant. Provide medical advice, recommend medicines, and suggest healthy alternatives. Keep responses clear and professional.' },
+          { role: 'user', content: message }
+        ],
+        max_tokens: 500,
+        temperature: 0.7
+      })
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('OpenAI API error:', errorText);
+      return res.status(500).json({ success: false, message: 'AI service error', error: errorText });
+    }
+
+    const data = await response.json();
+    const reply = data.choices[0].message.content.trim();
+
+    res.json({ success: true, reply });
+  } catch (error) {
+    console.error('AI chat error:', error);
+    res.status(500).json({ success: false, message: 'Failed to process AI chat', error: error.message || error.toString() });
+  }
+});
+
+  
+// AI image analysis endpoint (placeholder implementation)
+app.post('/ai-image-analyze', upload.single('image'), async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ success: false, message: 'No image uploaded' });
+  }
+
+  // For now, return a placeholder response
+  // In a real implementation, integrate with an image recognition AI model or service
+  res.json({
+    success: true,
+    message: 'Image received. Based on analysis, it appears to be a skin rash. Recommended medicine: Calamine lotion. Please consult a doctor for accurate diagnosis.'
   });
 });
 

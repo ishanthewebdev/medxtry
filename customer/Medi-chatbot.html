@@ -2,121 +2,242 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HealthBot Assistant</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Medi-ChatBot</title>
   <style>
-    .chat-scroll {
-      max-height: 400px;
-      overflow-y: auto;
-      scroll-behavior: smooth;
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f4f8;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
     }
-    .image-preview {
-      max-width: 100%;
-      max-height: 200px;
-      margin-top: 10px;
+    header {
+      background: #667eea;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.5rem;
+    }
+    #chatContainer {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 1rem;
+      overflow-y: auto;
+      background: white;
+      border: 1px solid #ccc;
+      margin: 1rem;
       border-radius: 8px;
+    }
+    .message {
+      margin-bottom: 1rem;
+      max-width: 70%;
+      padding: 0.5rem 1rem;
+      border-radius: 15px;
+      line-height: 1.4;
+    }
+    .userMessage {
+      background: #667eea;
+      color: white;
+      align-self: flex-end;
+      border-bottom-right-radius: 0;
+    }
+    .botMessage {
+      background: #e2e8f0;
+      color: #1a202c;
+      align-self: flex-start;
+      border-bottom-left-radius: 0;
+    }
+    #inputContainer {
+      display: flex;
+      padding: 1rem;
+      background: #edf2f7;
+      border-top: 1px solid #ccc;
+    }
+    #textInput {
+      flex: 1;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+      outline: none;
+    }
+    #sendBtn, #voiceBtn, #imageBtn {
+      margin-left: 0.5rem;
+      background: #667eea;
+      border: none;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #imageInput {
+      display: none;
+    }
+    #languageSelect {
+      margin-left: 0.5rem;
+      padding: 0.3rem;
+      font-size: 1rem;
+      border-radius: 5px;
       border: 1px solid #ccc;
     }
   </style>
 </head>
-<body class="bg-gradient-to-br from-sky-100 to-indigo-200 min-h-screen flex items-center justify-center">
-
-  <div class="w-full max-w-2xl mx-auto p-6 bg-white rounded-3xl shadow-2xl">
-    <h1 class="text-3xl font-bold text-center mb-6 text-indigo-700">💬 HealthBot Assistant</h1>
-
-    <div id="chat-window" class="chat-scroll p-4 bg-gray-100 rounded-lg mb-4 space-y-3 h-96 flex flex-col">
-      <!-- Chat messages will appear here -->
-    </div>
-
-    <form id="chat-form" class="flex items-center gap-2 flex-wrap">
-      <input id="chat-input" type="text" placeholder="Ask something..."
-        class="flex-grow p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-      <input id="image-input" type="file" accept="image/*" class="p-1 border border-gray-300 rounded-lg" />
-      <button type="submit"
-        class="bg-indigo-600 text-white px-5 py-3 rounded-lg hover:bg-indigo-700 transition">Send</button>
-    </form>
-
-    <img id="image-preview" class="image-preview hidden" alt="Image preview" />
-    <div id="image-diagnosis" class="mt-4 p-3 bg-green-100 rounded-lg text-green-800 hidden"></div>
+<body>
+  <header>Medi-ChatBot</header>
+  <div id="chatContainer" aria-live="polite" aria-atomic="false"></div>
+  <div id="inputContainer">
+    <input type="text" id="textInput" placeholder="Type your message here..." aria-label="Chat input" />
+    <button id="sendBtn" aria-label="Send message">➤</button>
+    <button id="voiceBtn" aria-label="Start voice input">🎤</button>
+    <input type="file" id="imageInput" accept="image/*" aria-label="Upload image for disease identification" />
+    <button id="imageBtn" aria-label="Upload image">📷</button>
+    <select id="languageSelect" aria-label="Select voice input language">
+      <option value="en-IN">English (India)</option>
+      <option value="hi-IN">Hindi (India)</option>
+    </select>
   </div>
 
   <script>
-    const form = document.getElementById('chat-form');
-    const input = document.getElementById('chat-input');
-    const chatWindow = document.getElementById('chat-window');
-    const imageInput = document.getElementById('image-input');
-    const imagePreview = document.getElementById('image-preview');
-    const imageDiagnosis = document.getElementById('image-diagnosis');
+    const chatContainer = document.getElementById('chatContainer');
+    const textInput = document.getElementById('textInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const voiceBtn = document.getElementById('voiceBtn');
+    const imageBtn = document.getElementById('imageBtn');
+    const imageInput = document.getElementById('imageInput');
+    const languageSelect = document.getElementById('languageSelect');
 
-    function appendMessage(sender, text) {
-      const msg = document.createElement('div');
-      msg.className = `p-3 rounded-xl max-w-[80%] ${sender === 'user' ? 'bg-indigo-100 self-end ml-auto text-right' : 'bg-green-100 self-start mr-auto'}`;
-      msg.innerText = text;
-      chatWindow.appendChild(msg);
-      chatWindow.scrollTop = chatWindow.scrollHeight;
+    let recognizing = false;
+    let recognition;
+
+    // Initialize Speech Recognition
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = languageSelect.value;
+
+      recognition.onstart = () => {
+        recognizing = true;
+        voiceBtn.textContent = '🛑';
+      };
+
+      recognition.onend = () => {
+        recognizing = false;
+        voiceBtn.textContent = '🎤';
+      };
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        textInput.value = transcript;
+        sendMessage();
+      };
+
+      languageSelect.addEventListener('change', () => {
+        if (recognition) {
+          recognition.lang = languageSelect.value;
+        }
+      });
+    } else {
+      voiceBtn.disabled = true;
+      voiceBtn.title = 'Speech recognition not supported in this browser.';
     }
 
-    imageInput.addEventListener('change', () => {
-      const file = imageInput.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          imagePreview.src = e.target.result;
-          imagePreview.classList.remove('hidden');
-          imageDiagnosis.textContent = '';
-          imageDiagnosis.classList.add('hidden');
-        };
-        reader.readAsDataURL(file);
-      } else {
-        imagePreview.src = '';
-        imagePreview.classList.add('hidden');
-        imageDiagnosis.textContent = '';
-        imageDiagnosis.classList.add('hidden');
+    voiceBtn.addEventListener('click', () => {
+      if (recognizing) {
+        recognition.stop();
+        return;
       }
+      recognition.lang = languageSelect.value;
+      recognition.start();
     });
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const userText = input.value.trim();
+    imageBtn.addEventListener('click', () => {
+      imageInput.click();
+    });
+
+    imageInput.addEventListener('change', async () => {
       const file = imageInput.files[0];
+      if (!file) return;
 
-      if (!userText && !file) return;
+      appendMessage('user', 'Sent an image for analysis.');
 
-      if (userText) {
-        appendMessage('user', userText);
-      }
-
-      input.value = '';
-      imageInput.value = '';
-      imagePreview.src = '';
-      imagePreview.classList.add('hidden');
-
-      // Send chat message or image to backend API
       const formData = new FormData();
-      if (userText) formData.append('message', userText);
-      if (file) formData.append('image', file);
+      formData.append('image', file);
+
+      appendMessage('bot', 'Analyzing image, please wait...');
 
       try {
-        const response = await fetch('http://localhost:3000/api/chat', {
+        const response = await fetch('http://localhost:3000/ai-image-analyze', {
           method: 'POST',
           body: formData
         });
-        const result = await response.json();
-
-        if (result.reply) {
-          appendMessage('bot', result.reply);
-        }
-
-        if (result.imageDiagnosis) {
-          imageDiagnosis.textContent = result.imageDiagnosis;
-          imageDiagnosis.classList.remove('hidden');
+        const data = await response.json();
+        if (data.success) {
+          appendMessage('bot', data.message);
+        } else {
+          appendMessage('bot', 'Failed to analyze image.');
         }
       } catch (error) {
-        appendMessage('bot', 'Error: Unable to get response from server.');
+        appendMessage('bot', 'Error analyzing image.');
       }
     });
-  </script>
 
+    sendBtn.addEventListener('click', sendMessage);
+    textInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        sendMessage();
+      }
+    });
+
+    function appendMessage(sender, text) {
+      const msgDiv = document.createElement('div');
+      msgDiv.classList.add('message');
+      msgDiv.classList.add(sender === 'user' ? 'userMessage' : 'botMessage');
+      msgDiv.textContent = text;
+      chatContainer.appendChild(msgDiv);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    async function sendMessage() {
+      const message = textInput.value.trim();
+      if (!message) return;
+
+      appendMessage('user', message);
+      textInput.value = '';
+
+      appendMessage('bot', 'Thinking...');
+
+      try {
+        const response = await fetch('http://localhost:3000/ai-chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message })
+        });
+        const data = await response.json();
+        if (data.success) {
+          // Remove last "Thinking..." message
+          const botMessages = chatContainer.querySelectorAll('.botMessage');
+          if (botMessages.length > 0) {
+            botMessages[botMessages.length - 1].remove();
+          }
+          appendMessage('bot', data.reply);
+        } else {
+          appendMessage('bot', 'Sorry, I could not process your request.');
+        }
+      } catch (error) {
+        appendMessage('bot', 'Error communicating with AI service.');
+      }
+    }
+  </script>
 </body>
 </html>
