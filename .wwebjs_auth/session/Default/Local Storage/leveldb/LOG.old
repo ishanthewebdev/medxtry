@@ -1,0 +1,15 @@
+2025/04/23-20:43:02.209 22f4 Reusing MANIFEST C:\Users\ishan\Documents\MedX\MedX\medi-erp-whatsapp\.wwebjs_auth\session\Default\Local Storage\leveldb/MANIFEST-000001
+2025/04/23-20:43:02.217 22f4 Recovering log #91
+2025/04/23-20:43:02.224 22f4 Reusing old log C:\Users\ishan\Documents\MedX\MedX\medi-erp-whatsapp\.wwebjs_auth\session\Default\Local Storage\leveldb/000091.log 
+2025/04/23-20:53:11.749 4f64 Level-0 table #95: started
+2025/04/23-20:53:11.761 4f64 Level-0 table #95: 16129 bytes OK
+2025/04/23-20:53:11.763 4f64 Delete type=0 #91
+2025/04/23-20:53:11.765 4f64 Compacting 4@0 + 1@1 files
+2025/04/23-20:53:11.771 4f64 Generated table #96@0: 567 keys, 9996 bytes
+2025/04/23-20:53:11.771 4f64 Compacted 4@0 + 1@1 files => 9996 bytes
+2025/04/23-20:53:11.772 4f64 compacted to: files[ 0 1 1 0 0 0 0 ]
+2025/04/23-20:53:11.773 4f64 Delete type=2 #83
+2025/04/23-20:53:11.773 4f64 Delete type=2 #85
+2025/04/23-20:53:11.773 4f64 Delete type=2 #88
+2025/04/23-20:53:11.773 4f64 Delete type=2 #92
+2025/04/23-20:53:11.773 4f64 Delete type=2 #95

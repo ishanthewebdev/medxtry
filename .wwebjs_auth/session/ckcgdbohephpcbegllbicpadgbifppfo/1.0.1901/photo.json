@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 1,
+  "campaigns": [
+    {
+      "campaignId": "7bc3d39d-a027-4f43-9a0f-a1eca4858614",
+      "logo": {
+        "imageUrl": "398c35dc-cf1d-4f2f-9fb7-32a505f34a20.png",
+        "destinationUrl": "https://rareevo.io/?tracking=braveperks",
+        "alt": "RareEVO - Web3 comes to life in Vegas this August! Secure your NFT tickets before they're gone! - Shop Now",
+        "companyName": "Rare Social"
+      },
+      "wallpapers": [
+        {
+          "imageUrl": "a75d23d2-6df6-49eb-b55f-c5fb9f2177d8.jpg",
+          "creativeInstanceId": "01d50d82-142e-43cb-8a22-080f8e0261d9",
+          "focalPoint": {
+            "x": 1280,
+            "y": 720
+          }
+        },
+        {
+          "imageUrl": "d1489b9f-aade-4db2-a3cd-b48eb14c52cb.jpg",
+          "creativeInstanceId": "e86a73dd-ddd7-410c-b6eb-c2ad50c0693a",
+          "focalPoint": {
+            "x": 1391,
+            "y": 720
+          },
+          "logo": {
+            "imageUrl": "0f023b3a-bbb5-4f79-be21-594d546488e7.png",
+            "destinationUrl": "https://rareevo.io/?tracking=braveperks",
+            "alt": "RareEVO - Web3 comes to life in Vegas this August! Secure your NFT tickets before they're gone! - Shop Now",
+            "companyName": "Rare Social"
+          }
+        },
+        {
+          "imageUrl": "bce26779-1954-4728-84fd-8dc05d29e170.jpg",
+          "creativeInstanceId": "2a61436b-8a75-4129-97c7-ee71c7b1c424",
+          "focalPoint": {
+            "x": 1280,
+            "y": 720
+          },
+          "logo": {
+            "imageUrl": "0e9d34ab-e3b7-4a4b-9401-e1d982ccf696.png",
+            "destinationUrl": "https://rareevo.io/?tracking=braveperks",
+            "alt": "RareEVO - Web3 comes to life in Vegas this August! Secure your NFT tickets before they're gone! - Shop Now",
+            "companyName": "Rare Social"
+          }
+        }
+      ]
+    }
+  ],
+  "campaigns2": [
+    {
+      "campaignId": "7bc3d39d-a027-4f43-9a0f-a1eca4858614",
+      "logo": {
+        "imageUrl": "398c35dc-cf1d-4f2f-9fb7-32a505f34a20.png",
+        "destinationUrl": "https://rareevo.io/?tracking=braveperks",
+        "alt": "RareEVO - Web3 comes to life in Vegas this August! Secure your NFT tickets before they're gone! - Shop Now",
+        "companyName": "Rare Social"
+      },
+      "wallpapers": [
+        {
+          "imageUrl": "a75d23d2-6df6-49eb-b55f-c5fb9f2177d8.jpg",
+          "creativeInstanceId": "01d50d82-142e-43cb-8a22-080f8e0261d9",
+          "focalPoint": {
+            "x": 1280,
+            "y": 720
+          }
+        },
+        {
+          "imageUrl": "d1489b9f-aade-4db2-a3cd-b48eb14c52cb.jpg",
+          "creativeInstanceId": "e86a73dd-ddd7-410c-b6eb-c2ad50c0693a",
+          "focalPoint": {
+            "x": 1391,
+            "y": 720
+          },
+          "logo": {
+            "imageUrl": "0f023b3a-bbb5-4f79-be21-594d546488e7.png",
+            "destinationUrl": "https://rareevo.io/?tracking=braveperks",
+            "alt": "RareEVO - Web3 comes to life in Vegas this August! Secure your NFT tickets before they're gone! - Shop Now",
+            "companyName": "Rare Social"
+          }
+        },
+        {
+          "imageUrl": "bce26779-1954-4728-84fd-8dc05d29e170.jpg",
+          "creativeInstanceId": "2a61436b-8a75-4129-97c7-ee71c7b1c424",
+          "focalPoint": {
+            "x": 1280,
+            "y": 720
+          },
+          "logo": {
+            "imageUrl": "0e9d34ab-e3b7-4a4b-9401-e1d982ccf696.png",
+            "destinationUrl": "https://rareevo.io/?tracking=braveperks",
+            "alt": "RareEVO - Web3 comes to life in Vegas this August! Secure your NFT tickets before they're gone! - Shop Now",
+            "companyName": "Rare Social"
+          }
+        }
+      ]
+    }
+  ]
+}

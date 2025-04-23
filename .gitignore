@@ -1,2 +1,0 @@
-# Ignore wwebjs auth session files to avoid permission issues
-.wwebjs_auth/
