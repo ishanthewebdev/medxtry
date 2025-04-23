@@ -1,0 +1,396 @@
+/* Retailer page simplified and responsive CSS with indigo color palette */
+
+/* Reset and base styles */
+* {
+  box-sizing: border-box;
+}
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f0f4f8;
+  color: #1e293b; /* dark blue-gray */
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+a {
+  color: #5a67d8; /* indigo-500 */
+  text-decoration: none;
+  font-weight: 700;
+  transition: color 0.3s ease;
+}
+a:hover {
+  color: #7f9cf5; /* lighter indigo */
+  text-decoration: underline;
+}
+/* Navbar styles */
+nav {
+  background: #5a67d8; /* indigo-500 */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  box-shadow: 0 2px 6px rgba(90, 103, 216, 0.3);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  transition: background-color 0.3s ease;
+}
+nav .brand {
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: #f0f4f8;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  user-select: none;
+  font-family: 'Segoe UI Black', 'Arial Black', sans-serif;
+  text-shadow: none;
+}
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+}
+nav ul li {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #e0e7ff; /* indigo-100 */
+  padding: 6px 12px;
+  border-radius: 8px;
+  transition: background 0.3s ease;
+  box-shadow: none;
+}
+nav ul li:hover {
+  background: #434190; /* indigo-700 */
+  color: white;
+}
+/* Dark mode toggle button */
+#darkModeToggle {
+  background-color: #434190; /* indigo-700 */
+  color: #f0f4f8;
+  border: none;
+  border-radius: 8px;
+  padding: 4px 10px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.8rem;
+  transition: background-color 0.3s ease;
+  box-shadow: none;
+}
+#darkModeToggle:hover {
+  background-color: #5a67d8; /* indigo-500 */
+}
+/* Main content layout */
+.main-wrapper {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto 40px auto;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(90, 103, 216, 0.1);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+.container, .side-panel {
+  background: #eef2ff; /* indigo-50 */
+  border-radius: 12px;
+  color: #1e293b;
+  padding: 25px 30px;
+  box-sizing: border-box;
+  transition: box-shadow 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+  box-shadow: 0 1px 6px rgba(90, 103, 216, 0.1);
+}
+.container:hover, .side-panel:hover {
+  box-shadow: 0 3px 12px rgba(90, 103, 216, 0.15);
+}
+.container {
+  flex: 1 1 600px;
+  max-width: 600px;
+  min-width: 320px;
+}
+.side-panel {
+  flex: 1 1 280px;
+  max-width: 280px;
+  min-width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+h1, h2, h3 {
+  margin-bottom: 20px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: #4c51bf; /* indigo-700 */
+  text-shadow: none;
+  transition: color 0.3s ease;
+}
+h1 {
+  font-size: 2rem;
+}
+h2 {
+  font-size: 1.6rem;
+  margin-top: 0;
+}
+h3 {
+  font-size: 1.3rem;
+}
+form {
+  margin-bottom: 30px;
+}
+input, select, textarea, button {
+  width: 100%;
+  max-width: 100%;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  border: 1px solid #c3dafe; /* indigo-200 */
+  background: #ffffff;
+  color: #1e293b;
+  font-size: 1rem;
+  box-sizing: border-box;
+  font-family: inherit;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+  box-shadow: none;
+}
+input::placeholder, textarea::placeholder {
+  color: #a0aec0; /* gray-400 */
+  font-style: italic;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: #667eea; /* indigo-500 */
+  box-shadow: 0 0 8px 2px #667eea;
+  color: #1e293b;
+  font-weight: 600;
+}
+select {
+  cursor: pointer;
+  font-weight: 600;
+}
+select option {
+  color: #1e293b;
+  background-color: #ffffff;
+}
+#expiryDate {
+  font-weight: 700;
+  margin-bottom: 25px;
+  text-align: center;
+  font-size: 1.1rem;
+  color: #4c51bf; /* indigo-700 */
+  transition: color 0.3s ease;
+}
+button {
+  background-color: #5a67d8; /* indigo-500 */
+  color: #fff;
+  font-weight: 700;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 1rem;
+  letter-spacing: 0.05em;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.15s ease;
+  user-select: none;
+  width: 100%;
+  box-shadow: none;
+}
+button:hover {
+  background-color: #434190; /* indigo-700 */
+  box-shadow: 0 3px 10px rgba(67, 65, 144, 0.5);
+  transform: translateY(-2px);
+}
+button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(90, 103, 216, 0.3);
+}
+/* Error and success messages */
+.error {
+  color: #e53e3e; /* red-600 */
+  margin-bottom: 15px;
+  font-weight: 700;
+}
+.success {
+  color: #48bb78; /* green-400 */
+  margin-bottom: 15px;
+  font-weight: 700;
+}
+.link, p.signup-link {
+  margin-top: 15px;
+  font-size: 1rem;
+  color: #4c51bf; /* indigo-700 */
+  transition: color 0.3s ease;
+}
+.link a, p.signup-link a {
+  color: #5a67d8; /* indigo-500 */
+  text-decoration: none;
+  font-weight: 700;
+  transition: color 0.3s ease;
+}
+.link a:hover, p.signup-link a:hover {
+  color: #7f9cf5; /* lighter indigo */
+  text-decoration: underline;
+}
+/* Sales modal */
+#salesModal {
+  display: none;
+  position: fixed;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #eef2ff; /* indigo-50 */
+  color: #1e293b;
+  padding: 20px;
+  border-radius: 12px;
+  max-width: 90vw;
+  max-height: 70vh;
+  overflow-y: auto;
+  z-index: 10000;
+  box-shadow: 0 4px 12px rgba(90, 103, 216, 0.3);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+#salesModal h3 {
+  margin-top: 0;
+}
+#salesTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+#salesTable th, #salesTable td {
+  border-bottom: 1px solid #5a67d8;
+  padding: 8px;
+  text-align: left;
+  transition: color 0.3s ease, border-color 0.3s ease;
+}
+#salesTable td.numeric {
+  text-align: right;
+}
+#salesLoading, #salesError {
+  margin-top: 10px;
+}
+#salesError {
+  color: #e53e3e;
+  display: none;
+}
+/* Dark mode styles */
+.dark body {
+  background-color: #0f172a;
+  color: #cbd5e1; /* gray-300 */
+}
+.dark a {
+  color: #a3bffa; /* indigo-300 */
+}
+.dark a:hover {
+  color: #c3dafe; /* indigo-200 */
+}
+.dark nav {
+  background: #1e293b; /* dark indigo */
+  box-shadow: 0 2px 6px rgba(30, 41, 59, 0.6);
+}
+.dark nav ul li {
+  color: #cbd5e1; /* gray-300 */
+  box-shadow: none;
+}
+.dark nav ul li:hover {
+  background: #4338ca; /* indigo-700 */
+  color: #f0f4f8;
+}
+/* Dark mode toggle button */
+.dark #darkModeToggle {
+  background-color: #667eea; /* indigo-500 */
+  color: #f0f4f8;
+  box-shadow: none;
+}
+.dark #darkModeToggle:hover {
+  background-color: #5a67d8; /* indigo-600 */
+}
+/* Dark mode main content */
+.dark .main-wrapper {
+  background-color: #1e293b;
+  color: #cbd5e1;
+  box-shadow: 0 2px 8px rgba(67, 70, 144, 0.3);
+}
+.dark .container, .dark .side-panel {
+  background: #334155;
+  color: #cbd5e1;
+  box-shadow: 0 1px 6px rgba(67, 70, 144, 0.2);
+}
+.dark h1, .dark h2, .dark h3 {
+  color: #a3bffa;
+}
+.dark input, .dark select, .dark textarea, .dark button {
+  background: #1e293b;
+  color: #cbd5e1;
+  border-color: #4c51bf;
+  box-shadow: none;
+}
+.dark input::placeholder, .dark textarea::placeholder {
+  color: #94a3b8;
+}
+.dark input:focus, .dark select:focus, .dark textarea:focus {
+  border-color: #7f9cf5;
+  box-shadow: 0 0 8px 2px #7f9cf5;
+  color: #f0f4f8;
+}
+.dark button {
+  background-color: #667eea;
+  box-shadow: none;
+}
+.dark button:hover {
+  background-color: #5a67d8;
+  box-shadow: 0 3px 10px rgba(90, 103, 216, 0.5);
+}
+/* Responsive layout */
+@media (max-width: 768px) {
+  nav ul {
+    gap: 10px;
+  }
+  .main-wrapper {
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+  }
+  .container, .side-panel {
+    max-width: 100%;
+    min-width: auto;
+    width: 100%;
+  }
+  .side-panel {
+    flex-direction: row;
+    justify-content: space-around;
+  }
+  #salesModal {
+    top: 5%;
+    max-height: 80vh;
+  }
+}
+@media (max-width: 480px) {
+  h1 {
+    font-size: 1.5rem;
+  }
+  h2, h3 {
+    font-size: 1.1rem;
+  }
+  button {
+    font-size: 1rem;
+    padding: 12px;
+  }
+  nav .brand {
+    font-size: 1.4rem;
+  }
+  nav ul li {
+    font-size: 0.9rem;
+    padding: 4px 8px;
+  }
+}
