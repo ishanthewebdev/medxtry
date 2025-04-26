@@ -1,94 +1,305 @@
-// OTP verification store and endpoints
 const express = require('express');
+const { Client, LocalAuth } = require('whatsapp-web.js');
+const qrcode = require('qrcode-terminal');
+const cors = require('cors');
 const multer = require('multer');
-const upload = multer({ dest: 'uploads/' });
+const MedicineDB = require('./medicineDb');
+
 const app = express();
+const port = 3000;
 
-const port = process.env.PORT || 3000;
+const medicineDB = new MedicineDB();
 
-const otpStore = {}; // { phone: { otp: '123456', expiresAt: Date } }
+medicineDB.initialize()
+  .then(() => medicineDB.importFromCSV())
+  .catch(err => console.error('DB initialization error:', err));
 
-// Helper function to generate 6-digit OTP
-function generateOTP() {
-  return Math.floor(100000 + Math.random() * 900000).toString();
-}
+// const corsOptions = {
+//   origin: 'http://127.0.0.1:5501', // Or whatever Live Server shows
+//   methods: ['GET', 'POST'],
+//   allowedHeaders: ['Content-Type']
+// };
+// app.use(cors({
+//   origin: 'http://127.0.0.1:5501',
+//   methods: ['GET', 'POST'],
+//   credentials: true
+// }));
+app.use(cors()); // allows all origins
 
-// Endpoint to send OTP via WhatsApp
-app.post('/send-otp', async (req, res) => {
-  const { phone, userType } = req.body;
-  if (!phone || !userType) {
-    return res.status(400).json({ success: false, message: 'Missing phone or userType' });
+//app.use(cors(corsOptions)); // Allow requests from your frontend
+// Add this in your server.js file, after your `app.use(cors())` line
+app.get('/', (req, res) => {
+  res.send('✅ WhatsApp ERP Backend is running!');
+});
+
+app.use(express.json());  // Parse JSON data from requests
+
+const fs = require('fs');
+const path = require('path');
+const db = require('./db');
+const RETAILERS_JSON_PATH = path.join(__dirname, 'retailers.json');
+const CUSTOMERS_JSON_PATH = path.join(__dirname, 'customers.json');
+
+// Setup multer for file uploads
+const upload = multer({ dest: 'uploads/' });
+
+// Endpoint to upload custom medicine CSV for retailer
+app.post('/upload-medicine-csv', upload.single('file'), async (req, res) => {
+  const { email } = req.body;
+  if (!email) {
+    return res.status(400).json({ success: false, message: 'Missing retailer email' });
+  }
+  if (!req.file) {
+    return res.status(400).json({ success: false, message: 'No file uploaded' });
+  }
+
+  const safeEmail = email.replace(/[^a-zA-Z0-9]/g, '_');
+  const retailerCsvPath = path.join(__dirname, 'retailers', `medicines_${safeEmail}.csv`);
+  const retailerDbPath = path.join(__dirname, 'retailers', `medicines_${safeEmail}.db`);
+
+  try {
+    // Move uploaded file to retailer CSV path (overwrite if exists)
+    fs.renameSync(req.file.path, retailerCsvPath);
+
+    // Delete existing DB file if exists to ensure fresh initialization
+    if (fs.existsSync(retailerDbPath)) {
+      fs.unlinkSync(retailerDbPath);
+    }
+
+    // Initialize MedicineDB for retailer and import CSV
+    const retailerMedicineDB = new MedicineDB(retailerDbPath, retailerCsvPath);
+    await retailerMedicineDB.initialize();
+    await retailerMedicineDB.importFromCSV();
+    retailerMedicineDB.close();
+
+    res.json({ success: true, message: 'Medicine CSV uploaded and database updated successfully' });
+  } catch (err) {
+    console.error('Error processing uploaded medicine CSV:', err);
+    res.status(500).json({ success: false, message: 'Failed to process uploaded CSV', error: err.message });
+  }
+});
+
+const client = new Client({
+  authStrategy: new LocalAuth(),
+  puppeteer: {
+    executablePath: 'C:/Program Files/BraveSoftware/Brave-Browser/Application/brave.exe',
+    headless: true,  // Keep it headless once linked
+    args: ['--no-sandbox', '--disable-setuid-sandbox']
+  }
+});
+
+client.on('qr', (qr) => {
+  qrcode.generate(qr, { small: true });
+});
+
+client.on('ready', () => {
+  console.log('WhatsApp Bot is ready!');
+});
+
+client.initialize();
+
+// API Endpoint to send a message and update purchase history
+app.post('/send-message', async (req, res) => {
+  const { phone, message, retailerEmail, customerName, medicineName, expiryDate, quantity } = req.body;
+
+  console.log('Received /send-message request with data:', { phone, message, retailerEmail, customerName, medicineName, expiryDate, quantity });
+
+  if (!phone || !message) {
+    console.log('Missing phone or message in request');
+    return res.status(400).json({ success: false, message: 'Missing phone or message' });
   }
 
   if (!client.info || !client.info.wid) {
+    console.log('WhatsApp client not ready');
     return res.status(503).json({ success: false, message: 'WhatsApp client not ready' });
   }
 
-  const otp = generateOTP();
-  const expiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes expiry
-  otpStore[phone] = { otp, expiresAt };
-
-  const message = `Your OTP for Medicine ERP signup is: ${otp}. It will expire in 5 minutes.`;
-
   try {
-    await client.sendMessage(`${phone}@c.us`, message);
-    console.log(`OTP sent to ${phone}: ${otp}`);
-    res.json({ success: true, message: 'OTP sent successfully' });
+    console.log(`Sending message to ${phone}@c.us`);
+    const response = await client.sendMessage(`${phone}@c.us`, message);
+    console.log('Message sent successfully via WhatsApp API');
+
+    if (retailerEmail && customerName && medicineName && expiryDate) {
+      console.log('All required data present for purchase history update');
+
+      // Async function to check customer existence and update purchase history
+      const updatePurchaseHistoryAsync = async () => {
+        try {
+          const phoneNormalized = phone.replace(/\D/g, '').slice(-10);
+
+          // Check if customer exists in database
+          const customerExists = await new Promise((resolve, reject) => {
+            db.get(
+              `SELECT id FROM customers WHERE SUBSTR(phone, -10) = ?`,
+              [phoneNormalized],
+              (err, row) => {
+                if (err) {
+                  reject(err);
+                } else {
+                  resolve(!!row);
+                }
+              }
+            );
+          });
+
+          if (customerExists) {
+            console.log('Customer exists in database, updating purchase history');
+            await updatePurchaseHistory();
+
+            // Insert purchase history record into database
+            try {
+              // Find customer id by matching phone number in customers table
+              const getCustomerIdByPhone = () => {
+                return new Promise((resolve, reject) => {
+                  db.all(
+                    `SELECT id, phone FROM customers`,
+                    [],
+                    (err, rows) => {
+                      if (err) {
+                        reject(err);
+                      } else {
+                        const matched = rows.find(r => {
+                          const custPhone = r.phone ? r.phone.replace(/\D/g, '').slice(-10) : '';
+                          return custPhone === phoneNormalized;
+                        });
+                        resolve(matched ? matched.id : null);
+                      }
+                    }
+                  );
+                });
+              };
+
+              // Find retailer id by email
+              const getRetailerIdByEmail = () => {
+                return new Promise((resolve, reject) => {
+                  db.get(
+                    `SELECT id FROM retailers WHERE email = ?`,
+                    [retailerEmail.toLowerCase()],
+                    (err, row) => {
+                      if (err) {
+                        reject(err);
+                      } else {
+                        resolve(row ? row.id : null);
+                      }
+                    }
+                  );
+                });
+              };
+
+              // Get medicine price from retailer's medicine DB
+              const getMedicinePrice = () => {
+                return new Promise(async (resolve, reject) => {
+                  try {
+                    const safeEmail = retailerEmail.replace(/[^a-zA-Z0-9]/g, '_');
+                    const retailerDbPath = path.join(__dirname, 'retailers', `medicines_${safeEmail}.db`);
+                    const retailerCsvPath = path.join(__dirname, 'retailers', `medicines_${safeEmail}.csv`);
+                    const retailerMedicineDB = new MedicineDB(retailerDbPath, retailerCsvPath);
+                    await retailerMedicineDB.open();
+                    const medicines = await retailerMedicineDB.getAllMedicines();
+                    retailerMedicineDB.close();
+                    const medicine = medicines.find(med => med.name.toLowerCase() === medicineName.toLowerCase());
+                    resolve(medicine ? medicine.price : null);
+                  } catch (err) {
+                    resolve(null);
+                  }
+                });
+              };
+
+              const customerId = await getCustomerIdByPhone();
+              const retailerId = await getRetailerIdByEmail();
+              const price = await getMedicinePrice();
+
+              if (customerId && retailerId) {
+                console.log(`Inserting purchase history record for customerId=${customerId}, retailerId=${retailerId}, medicineName=${medicineName}, price=${price}, expiryDate=${expiryDate}`);
+                db.run(
+                  `INSERT INTO purchase_history (customer_id, retailer_id, medicine_name, quantity, price, expiry_date, message) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+                  [customerId, retailerId, medicineName, quantity || 1, price, expiryDate, message],
+                  function (err) {
+                    if (err) {
+                      console.error('Error inserting purchase history:', err);
+                    } else {
+                      console.log('Purchase history record inserted with id:', this.lastID);
+                    }
+                  }
+                );
+              } else {
+                console.log('Could not find customer or retailer id for purchase history insertion');
+              }
+            } catch (err) {
+              console.error('Error updating purchase history in database:', err);
+            }
+          } else {
+            console.log('Customer does not exist in database, skipping purchase history update');
+          }
+        } catch (err) {
+          console.error('Error checking customer existence in database:', err);
+          await updatePurchaseHistory();
+        }
+      };
+
+      const updatePurchaseHistory = async () => {
+        const safeEmail = retailerEmail.replace(/[^a-zA-Z0-9]/g, '_');
+        const retailerCustomerCsvPath = path.join(__dirname, 'retailers', `customers_${safeEmail}.csv`);
+        const globalCustomerCsvPath = path.join(__dirname, 'retailers', `customers_global.csv`);
+
+        const csvLine = `"${customerName}","","${phone}","${medicineName}","1","${expiryDate}","${message.replace(/"/g, '""')}"\n`;
+
+        try {
+          // Update retailer-specific customer CSV
+          if (!fs.existsSync(retailerCustomerCsvPath)) {
+            console.log('Retailer customer CSV file does not exist, creating with headers');
+            const headers = '"Customer Name","Location","Phone","Medicine Name","Quantity","Expiry Date","Message"\n';
+            await fs.promises.writeFile(retailerCustomerCsvPath, headers);
+          }
+          await fs.promises.appendFile(retailerCustomerCsvPath, csvLine);
+          console.log(`Purchase history updated for customer ${customerName} in ${retailerCustomerCsvPath}`);
+
+          // Update global customer CSV
+          if (!fs.existsSync(globalCustomerCsvPath)) {
+            console.log('Global customer CSV file does not exist, creating with headers');
+            const headers = '"Customer Name","Location","Phone","Medicine Name","Quantity","Expiry Date","Message"\n';
+            await fs.promises.writeFile(globalCustomerCsvPath, headers);
+          }
+          await fs.promises.appendFile(globalCustomerCsvPath, csvLine);
+          console.log(`Purchase history updated for customer ${customerName} in global customer CSV`);
+        } catch (err) {
+          console.error('Error writing customer data to CSV:', err);
+        }
+      };
+
+      await updatePurchaseHistoryAsync();
+    } else {
+      console.log('Insufficient data to update purchase history');
+    }
+
+    res.json({ success: true, message: 'Message sent successfully!' });
   } catch (err) {
-    console.error('Failed to send OTP:', err);
-    res.status(500).json({ success: false, message: 'Failed to send OTP', error: err.message });
+    console.error('Failed to send message via WhatsApp API:', JSON.stringify(err, Object.getOwnPropertyNames(err)));
+    res.status(500).json({ success: false, message: 'Failed to send message', error: err });
   }
 });
-
-// Endpoint to verify OTP
-app.post('/verify-otp', (req, res) => {
-  const { phone, otp } = req.body;
-  if (!phone || !otp) {
-    return res.status(400).json({ success: false, message: 'Missing phone or otp' });
+  
+// New endpoint to check if customers_global.csv exists and return its contents or status
+app.get('/check-global-purchase-history', async (req, res) => {
+  const globalCustomerCsvPath = path.join(__dirname, 'retailers', 'customers_global.csv');
+  try {
+    if (!fs.existsSync(globalCustomerCsvPath)) {
+      return res.json({ success: false, message: 'Global customer purchase history file does not exist' });
+    }
+    const data = await fs.promises.readFile(globalCustomerCsvPath, 'utf8');
+    res.json({ success: true, data });
+  } catch (err) {
+    console.error('Error reading global customer purchase history:', err);
+    res.status(500).json({ success: false, message: 'Failed to read global purchase history', error: err.message });
   }
-
-  const record = otpStore[phone];
-  if (!record) {
-    return res.status(400).json({ success: false, message: 'No OTP sent to this phone' });
-  }
-
-  if (Date.now() > record.expiresAt) {
-    delete otpStore[phone];
-    return res.status(400).json({ success: false, message: 'OTP expired' });
-  }
-
-  if (otp !== record.otp) {
-    return res.status(400).json({ success: false, message: 'Invalid OTP' });
-  }
-
-  // OTP verified, remove from store
-  delete otpStore[phone];
-  res.json({ success: true, message: 'OTP verified successfully' });
 });
-
-// Modify signup endpoint to require OTP verification
-// Removed dynamic override of signup handler to fix error
-
 
 app.post('/signup', async (req, res) => {
-  const { userType, email, phone, shopKeeperName, shopName, password, otp } = req.body;
+  const { userType, email, phone, shopKeeperName, shopName, password } = req.body;
 
   if (!userType || !email || !phone || !shopKeeperName || !password || (userType === 'retailer' && !shopName)) {
     return res.status(400).json({ success: false, message: 'Missing required fields' });
   }
-
-  if (!phone || !otp) {
-    return res.status(400).json({ success: false, message: 'Phone and OTP are required for signup' });
-  }
-
-  // Verify OTP before proceeding
-  const record = otpStore[phone];
-  if (!record || record.otp !== otp || Date.now() > record.expiresAt) {
-    return res.status(400).json({ success: false, message: 'Invalid or expired OTP' });
-  }
-
-  // OTP verified, remove from store
-  delete otpStore[phone];
 
   const tableName = userType === 'retailer' ? 'retailers' : 'customers';
 
@@ -130,6 +341,30 @@ app.post('/signup', async (req, res) => {
     console.error('Signup error:', error);
     res.status(500).json({ success: false, message: 'Internal server error' });
   }
+});
+
+app.post('/update-retailer-status', (req, res) => {
+  const { email, location, live } = req.body;
+  if (!email || typeof live !== 'boolean') {
+    return res.status(400).json({ success: false, message: 'Missing email or live status' });
+  }
+
+  const emailLower = email.trim().toLowerCase();
+
+  const updateQuery = `UPDATE retailers SET live = ?, location = ? WHERE LOWER(email) = ?`;
+
+  db.run(updateQuery, [live ? 1 : 0, location || null, emailLower], function(err) {
+    if (err) {
+      console.error('Error updating retailer status in database:', err);
+      return res.status(500).json({ success: false, message: 'Failed to update retailer status' });
+    }
+
+    if (this.changes === 0) {
+      return res.status(404).json({ success: false, message: 'Retailer not found' });
+    }
+
+    res.json({ success: true, message: 'Retailer status updated successfully' });
+  });
 });
 
 // Endpoint to get all live retailers with location
@@ -414,7 +649,6 @@ app.get('/medicines-expiring-soon', async (req, res) => {
     });
 
     retailerMedicineDB.close();
-    console.log('Expiring soon medicines response:', expiringSoonMedicines);
     res.json({ success: true, data: expiringSoonMedicines });
   } catch (err) {
     console.error('Error fetching expiring soon medicines:', err.stack || err);

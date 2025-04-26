@@ -1,0 +1,139 @@
+[33mcommit fbad63872148734e5c61dbdb6e26a16d1685262f[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m
+Author: Ishan Srivastava <ishansrivastava434@gmail.com>
+Date:   Fri Apr 25 13:30:15 2025 +0530
+
+    Revert "revert back bhai"
+    
+    This reverts commit 73bd70e4fb08f7a2312a159d4712c60b6d9f63af.
+
+[33mcommit 73bd70e4fb08f7a2312a159d4712c60b6d9f63af[m
+Author: Ishan Srivastava <ishansrivastava434@gmail.com>
+Date:   Wed Apr 23 22:46:41 2025 +0530
+
+    revert back bhai
+
+[33mcommit 7411e8019fc8f06ebba8ed273428a6b8c4ea5176[m[33m ([m[1;31morigin/main[m[33m)[m
+Author: Ishan Srivastava <ishansrivastava434@gmail.com>
+Date:   Wed Apr 23 21:38:16 2025 +0530
+
+     idk why but update
+
+[33mcommit c42426d04ccd01fd0cc65460ba90374cde02fb47[m
+Author: Ishan Srivastava <ishansrivastava434@gmail.com>
+Date:   Wed Apr 23 21:36:11 2025 +0530
+
+    Add .wwebjs_auth/ to .gitignore to fix permission issues with git add
+
+[33mcommit da187736087b4750ffac63b3ceae90c675052a69[m
+Author: Ishan Srivastava <ishansrivastava434@gmail.com>
+Date:   Tue Apr 22 09:46:00 2025 +0530
+
+    new id cheched
+
+[33mcommit 92b264b6c0fd69466b2d40d39a4a51331752ec3a[m
+Author: Ishan Srivastava <ishansrivastava434@gmail.com>
+Date:   Tue Apr 22 00:15:20 2025 +0530
+
+    expiry remainder for retailer
+
+[33mcommit 9ca18971b09e59af5f0581779a28459ba5145632[m
+Author: Ishan Srivastava <ishansrivastava434@gmail.com>
+Date:   Mon Apr 21 23:54:52 2025 +0530
+
+    expiry remainder added
+
+[33mcommit 8054e14791912445dedfee8486e83ab2a64d4741[m
+Author: Ishan Srivastava <ishansrivastava434@gmail.com>
+Date:   Mon Apr 21 22:59:40 2025 +0530
+
+     currently updated UI little bit and location and sales
+
+[33mcommit c91411bd97d1aeafc1e9726113e70ff245fc9ae6[m
+Author: Ishan Srivastava <ishansrivastava434@gmail.com>
+Date:   Mon Apr 21 22:05:06 2025 +0530
+
+     location and databse and purchase history fix
+
+[33mcommit 46f247d85b82f10fc03b6bd92d3e449ba5a6a7f4[m
+Author: Ishan Srivastava <ishansrivastava434@gmail.com>
+Date:   Sun Apr 20 18:06:12 2025 +0530
+
+    add to cart
+
+[33mcommit fe651f974a559ec88d353d0bc12671bd57863c0b[m
+Author: Ishan Srivastava <ishansrivastava434@gmail.com>
+Date:   Sun Apr 20 17:45:49 2025 +0530
+
+    add to cart
+
+[33mcommit 7b4257a9212ab018e69d41f75ebdab739f0ab47b[m
+Author: Ishan Srivastava <ishansrivastava434@gmail.com>
+Date:   Sun Apr 20 17:41:13 2025 +0530
+
+    location based searching
+
+[33mcommit b74fe828bfc8381f12942f0551195f88ccae565f[m
+Author: Ishan Srivastava <ishansrivastava434@gmail.com>
+Date:   Sun Apr 20 16:18:55 2025 +0530
+
+    customer edit some
+
+[33mcommit 422b9d3654fda2020e53e64464d5d10e68ceba1e[m
+Author: Ishan Srivastava <ishansrivastava434@gmail.com>
+Date:   Sun Apr 20 14:48:50 2025 +0530
+
+    customer add
+
+[33mcommit 2ef33467ea679c4f85fde62e8c8fa0fbf369d0c3[m
+Author: Ishan Srivastava <ishansrivastava434@gmail.com>
+Date:   Sun Apr 20 01:28:49 2025 +0530
+
+    sales updated
+
+[33mcommit 9333d4414dc6efe825cc3badde0dff19b6f53980[m
+Author: Ishan Srivastava <ishansrivastava434@gmail.com>
+Date:   Sun Apr 20 01:14:08 2025 +0530
+
+     css and sales
+
+[33mcommit 93690b615f7b690c20c99e15346c2bd8e67ba5bf[m
+Author: Ishan Srivastava <ishansrivastava434@gmail.com>
+Date:   Sun Apr 20 00:06:02 2025 +0530
+
+    css changesand sales
+
+[33mcommit d0c2481c652e8969b121c43d6fe2a2692698e9f2[m
+Author: Ishan Srivastava <ishansrivastava434@gmail.com>
+Date:   Sat Apr 19 23:51:11 2025 +0530
+
+    css changes
+
+[33mcommit fe2c42a713c5bfd1263e0d2658f2044048c198a0[m
+Author: Ishan Srivastava <ishansrivastava434@gmail.com>
+Date:   Sat Apr 19 23:14:02 2025 +0530
+
+     5th commit hai ig shopkeername updated
+
+[33mcommit 4940837d9ae1318c9252674ff3992ac068ea73d6[m
+Author: Ishan Srivastava <ishansrivastava434@gmail.com>
+Date:   Sat Apr 19 18:14:40 2025 +0530
+
+    4th
+
+[33mcommit 61bf6ae3401661cc82dece64e322c2897b9890c0[m
+Author: Ishan Srivastava <ishansrivastava434@gmail.com>
+Date:   Sat Apr 19 17:51:00 2025 +0530
+
+     third
+
+[33mcommit b9b42faaccc055d82156551d41479d75f3a5aa6d[m
+Author: Ishan Srivastava <ishansrivastava434@gmail.com>
+Date:   Sat Apr 19 17:19:42 2025 +0530
+
+    new 2 add
+
+[33mcommit 0e14fd858aaeeca9b390287215d71e3ac3e3d6f5[m
+Author: Ishan Srivastava <ishansrivastava434@gmail.com>
+Date:   Sat Apr 19 16:35:06 2025 +0530
+
+    Initial commit

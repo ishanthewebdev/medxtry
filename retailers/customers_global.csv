@@ -194,6 +194,7 @@ Message:
 din me 2 baar
 
 Thank you for choosing our service."
+<<<<<<< HEAD
 "krishan","","916283893292","Paracetol","1","2025-04-25","Dear krishan,
 
 Location: hostel,
@@ -327,5 +328,37 @@ Medicine Details:
 
 Message:
 twice a day
+
+Thank you for choosing our service."
+=======
+>>>>>>> parent of da18773 (new id cheched)
+"kokk0k","","917753867670","Paracetol","1","2025-04-25","Dear kokk0k,
+
+Location: ojoji,
+
+Shop Name: ritesh_med,
+
+Medicine Details:
+- Name: Paracetol
+- Quantity: 2
+- Expiry Date: 2025-04-25
+
+Message:
+okoujo
+
+Thank you for choosing our service."
+"kokk0k","","917753867670","CoughFree","1","2025-04-30","Dear kokk0k,
+
+Location: ojoji,
+
+Shop Name: ritesh_med,
+
+Medicine Details:
+- Name: CoughFree
+- Quantity: 2
+- Expiry Date: 2025-04-30
+
+Message:
+aajkatry
 
 Thank you for choosing our service."
